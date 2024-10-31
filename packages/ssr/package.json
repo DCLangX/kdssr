@@ -1,0 +1,77 @@
+{
+	"name": "kdssr",
+	"version": "2.0.0",
+	"description": "",
+	"type": "module",
+	"types": "./dist/index.d.mts",
+	"files": [
+		"dist"
+	],
+	"bin": {
+		"ssr": "./dist/cli/index.mjs"
+	},
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs"
+		},
+		"./client-entry": "./dist/plugin-vue3/client-entry.mjs",
+		"./server-entry": "./dist/plugin-nest/server-entry.mjs",
+		"./dist/*": "./dist/*"
+	},
+	"scripts": {
+		"start": "node build/src/server.js",
+		"dev": "tsx watch ./src/index.ts",
+		"build": "unbuild",
+		"build:tsc": "tsc&&tsc -p ./tsconfig.cjs.json",
+		"build:pkgroll": "pkgroll --clean-dist&&pkgroll --sourcemap",
+		"lint": "eslint",
+		"lint-fix": "eslint --fix src/**/*.ts",
+		"format": "prettier --write .",
+		"precommit": "pnpm run lint-fix && pnpm run format",
+		"prepush": "pnpm run lint ",
+		"test": "vitest"
+	},
+	"author": "GLY",
+	"license": "MIT",
+	"dependencies": {
+		"@types/es-module-lexer": "^0.4.3",
+		"@types/shelljs": "^0.8.15",
+		"cheerio": "^1.0.0",
+		"dotenv": "^16.4.5",
+		"es-module-lexer": "^1.5.4",
+		"esbuild": "^0.23.1",
+		"helmet": "^7.1.0",
+		"http-proxy-middleware": "^3.0.2",
+		"magic-string": "^0.30.12",
+		"ora": "^8.1.0",
+		"path-to-regexp": "^6.3.0",
+		"qs": "^6.13.0",
+		"rollup": "^4.24.2",
+		"shelljs": "^0.8.5",
+		"ssr-serialize-javascript": "^6.0.4",
+		"vitest": "^2.1.1",
+		"winston": "^3.14.2",
+		"yargs": "^17.7.2"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.10.0",
+		"@types/eslint__js": "^8.42.3",
+		"@types/node": "^22.5.5",
+		"eslint": "^9.10.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-prettier": "^5.2.1",
+		"pinia": "^2.2.2",
+		"pkgroll": "^2.5.0",
+		"prettier": "^3.3.3",
+		"typescript": "^5.6.2",
+		"typescript-eslint": "^8.6.0",
+		"unbuild": "^2.0.0",
+		"vue-router": "^4.4.5"
+	},
+	"peerDependencies": {
+		"pinia": "^2.2.2",
+		"vite": "^5.4.4",
+		"vue": "^3.5.4",
+		"vue-router": "^4.4.4"
+	}
+}

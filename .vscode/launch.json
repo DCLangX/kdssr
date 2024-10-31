@@ -1,0 +1,82 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch nestjs-vue3-ssr-pinia via PNPM",
+      "request": "launch",
+      "runtimeArgs": ["run-script", "start"],
+      "cwd": "${workspaceFolder}\\app\\nestjs-vue3-ssr-pinia",
+      "console": "integratedTerminal",
+      "runtimeExecutable": "pnpm",
+      "outputCapture": "std",
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**/vite/**",
+        // "${workspaceFolder}/node_modules/**/vite*/**/chunks/**",
+        "${workspaceFolder}/node_modules/**/glob*/**",
+        "${workspaceFolder}/node_modules/**/yargs*/**",
+        "${workspaceFolder}/node_modules/**/shelljs*/**"
+      ],
+      "type": "node",
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**"
+        // "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "Build nestjs-vue3-ssr-pinia via PNPM",
+      "request": "launch",
+      "runtimeArgs": ["run-script", "build"],
+      "cwd": "${workspaceFolder}\\app\\nestjs-vue3-ssr-pinia",
+      "console": "integratedTerminal",
+      "runtimeExecutable": "pnpm",
+      "outputCapture": "std",
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**/vite/**",
+        // "${workspaceFolder}/node_modules/**/vite*/**/chunks/**",
+        "${workspaceFolder}/node_modules/**/glob*/**",
+        "${workspaceFolder}/node_modules/**/yargs*/**",
+        "${workspaceFolder}/node_modules/**/shelljs*/**"
+      ],
+      "type": "node",
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**"
+        // "!**/node_modules/**"
+      ]
+    },
+    {
+      "name": "Run prod nestjs-vue3-ssr-pinia",
+      "request": "launch",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "cwd": "${workspaceFolder}\\app\\nestjs-vue3-ssr-pinia",
+      "program": "dist/main.js",
+      "console": "integratedTerminal",
+      "outputCapture": "std",
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**/vite/**",
+        // "${workspaceFolder}/node_modules/**/vite*/**/chunks/**",
+        "${workspaceFolder}/node_modules/**/glob*/**",
+        "${workspaceFolder}/node_modules/**/yargs*/**",
+        "${workspaceFolder}/node_modules/**/shelljs*/**"
+      ],
+      "type": "node",
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**"
+        // "!**/node_modules/**"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "启动程序",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}\\packages\\ssr\\dist\\cli\\index.mjs",
+      "console": "integratedTerminal",
+      "args": ["start"]
+    }
+  ]
+}

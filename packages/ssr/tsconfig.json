@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"lib": ["esnext"],
+		"target": "esnext",
+		"module": "Preserve",
+		"moduleResolution": "Bundler",
+		"outDir": "./dist/esm",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"sourceMap": true,
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
+		"moduleDetection": "force",
+		"allowJs": true,
+		"isolatedModules": true,
+		"skipLibCheck": true,
+		"declaration": true,
+		"declarationDir": "./dist/types"
+	},
+	"include": ["src/**/*.ts", "src/**/*.d.ts"],
+	"exclude": ["node_modules", "**/*.test.ts"]
+}

@@ -1,0 +1,10 @@
+# Ignore artifacts:
+build
+dist
+LICENSE
+
+# Ignore all HTML files:
+LICENSE
+.gitattributes
+.gitignore
+.prettierignore
