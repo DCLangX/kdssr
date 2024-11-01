@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="p-20">
 		<Search />
 		<template v-if="indexData">
 			<Slider :data="indexData[0].components" />

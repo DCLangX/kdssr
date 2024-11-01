@@ -2,6 +2,7 @@ import { defineConfig, type Plugin } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import Unocss from "unocss/vite";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,7 +25,7 @@ export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => ({
 		// shelljs经由rollup打包后有问题，会报错，故排除该项，并且需要在生产部署的依赖上增加shelljs
 		noExternal: [/\.(css|less|sass|scss)$/, "swiper", /swiper/],
 	},
-	plugins: [vue()],
+	plugins: [vue(), Unocss()],
 	resolve: {
 		alias: {
 			"@": resolve(__dirname, "./web"),
