@@ -48,6 +48,7 @@ function matchPath(pathname, options = {}) {
 			strict,
 			sensitive,
 		});
+		console.log("%c Line:47 🧀 regexp", "color:#fff;background:#ea7e5c", regexp);
 		const match = regexp.exec(pathname);
 
 		if (!match) return null;

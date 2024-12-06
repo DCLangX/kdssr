@@ -23,6 +23,12 @@ export const normalizeEndPath = (path: string) => {
 	return path;
 };
 
+/**
+ * @description: 用于将参数格式化为标准化的命令行参数字符串形式
+ * @param {Argv} argv
+ * @param {object} options
+ * @return {*}
+ */
 export const getNormalizeArgv = (
 	argv: Argv,
 	options: {

@@ -6,9 +6,11 @@ import type { ViteDevServer } from "vite";
 import { createRequire } from "node:module";
 import * as cheerio from "cheerio";
 import { resolve, join } from "node:path";
-const defaultConfig = loadConfig();
 import { accessFile, getCwd } from "../utils";
 import { pathToFileURL } from "node:url";
+const require = createRequire(import.meta.url);
+
+const defaultConfig = loadConfig();
 
 // const sf = judgeServerFramework();
 // const f = judgeFramework();
@@ -51,9 +53,14 @@ async function render(ctx: ISSRContext, options?: UserConfig) {
 	const mergeConfig: IConfig = {
 		...defaultConfig,
 		...(options?.dynamicFile?.configFile
-			? (createRequire(options.dynamicFile.configFile) as any).userConfig
+			? (require(options.dynamicFile.configFile) as any).userConfig
 			: {}),
 	};
+	console.log(
+		"%c Line:54 🍏 mergeConfig",
+		"color:#fff;background:#3f7cff",
+		mergeConfig,
+	);
 
 	const config: IConfig = Object.assign({}, mergeConfig, options);
 	// support combine dynamic customeHeadScript when call render

@@ -1,10 +1,15 @@
 import { promises } from "fs";
-import { EventEmitter } from "events";
+import { EventEmitter } from "node:events";
 import { resolve, isAbsolute, dirname } from "node:path";
 import type { UserConfig, Plugin } from "vite";
 import { parse as parseImports } from "es-module-lexer";
 import MagicString from "magic-string";
-import type { OutputOptions, PreRenderedChunk, PluginContext } from "rollup";
+import type {
+	OutputOptions,
+	PreRenderedChunk,
+	PluginContext,
+	GetModuleInfo,
+} from "rollup";
 import shell from "shelljs";
 
 import {
@@ -66,21 +71,13 @@ const vendorList = [
 	"react-router-dom",
 	"react-dom",
 	"@vue",
-	"ssr-hoc-react",
-	"ssr-hoc-react18",
-	"ssr-client-utils",
-	"ssr-common-utils",
 	"pinia",
 	"@babel/runtime",
-	"ssr-plugin-vue3",
-	"ssr-plugin-vue",
-	"ssr-plugin-react",
+	"kdssr",
 	"react/jsx-runtime",
 	"path-to-regexp",
 	"plugin-vue:export-helper",
 	"@vue/devtools-api",
-	"ssr-hoc-vue3",
-	"ssr-hoc-vue",
 ];
 const cyrb53 = function (str: string, seed = 0) {
 	let h1 = 0xdeadbeef ^ seed;
@@ -228,32 +225,20 @@ const chunkNamePlugin = function (): Plugin {
 				);
 				let str = new MagicString(source);
 				const imports = parseImports(source)[0];
+				// 获得import语句的解析
 				for (let index = 0; index < imports.length; index++) {
 					const {
-						s: start,
-						e: end,
-						ss: statementStart,
-						se: statementEnd,
+						s: start, //import内容的开始位置
+						e: end, //import内容的结束位置
+						ss: statementStart, //完整一条import语句的开始位置
+						se: statementEnd, //完整一条import语句的结束位置
 					} = imports[index];
 					// const rawUrl = source.slice(start, end);
 					const rawUrl = source.slice(statementStart, statementEnd);
-					console.log(
-						"%c Line:233 🍓 rawUrl",
-						"color:#fff;background:#f5ce50",
-						rawUrl,
-					);
-					console.log(
-						"%c Line:233 🍓 rawrawUrl",
-						"color:#fff;background:#f5ce50",
-						source.slice(statementStart, statementEnd),
-					);
+					// 这条import语句的内容
 					const chunkTypeName = viteCommentRegExp.exec(rawUrl)?.[1];
+					// 匹配导入语句中包含的 chunkTypeName 注释，并从注释中提取 chunkTypeName 的值，如import(/* chunkTypeName: "index" */ '@/pages/index/render.vue')
 					if (!rawUrl.includes("render")) {
-						console.log(
-							"%c Line:245 🍻 rawUrl",
-							"color:#fff;background:#e41a6a",
-							rawUrl,
-						);
 						if (
 							rawUrl.includes("layout") ||
 							rawUrl.includes("App") ||
@@ -268,6 +253,7 @@ const chunkNamePlugin = function (): Plugin {
 								statementEnd - 2,
 								`?chunkName=${chunkTypeName}`,
 							);
+							// 类型收窄到这里，基本是动态路由，普通import结尾是',动态路由结尾是')，故需要往前推两位字符插入
 						} else {
 							str = str.appendRight(
 								statementEnd - 1,
@@ -280,12 +266,8 @@ const chunkNamePlugin = function (): Plugin {
 						statementEnd - 2,
 						`?chunkName=${chunkTypeName}`,
 					);
+					// 类型收窄到这里，基本是动态路由，普通import结尾是',动态路由结尾是')，故需要往前推两位字符插入
 				}
-				console.log(
-					"%c Line:264 🥝 str.toString()",
-					"color:#fff;background:#b03734",
-					str.toString(),
-				);
 				return {
 					code: str.toString(),
 				};
@@ -305,11 +287,13 @@ const recordInfo = (
 	const sign = id.includes("node_modules") ? getPkgName(id) : id;
 	if (id.includes("node_modules")) {
 		filePathMap[sign] = parentId;
+		// 记录文件里的node_modules依赖，结构是{ [key:依赖名] : 所在文件id }
 	}
 	if (!dependenciesMap[sign]) {
 		dependenciesMap[sign] = defaultChunkName ? [defaultChunkName] : [];
 	}
 	chunkName && dependenciesMap[sign].push(chunkName);
+	// 记录文件里的依赖类型，结构是{ [key:依赖名] : (模块类型名或"dynamic"或"vendor")[] }
 	if (id.includes("node_modules")) {
 		dependenciesMap[sign].push("vendor");
 	}
@@ -317,10 +301,12 @@ const recordInfo = (
 		dependenciesMap[sign] = dependenciesMap[sign].concat(
 			dependenciesMap[parentId],
 		);
+		// 把父模块作为依赖时，所属的模块类型也加上
 	}
 	dependenciesMap[sign] = Array.from(
 		new Set(dependenciesMap[sign].filter(Boolean)),
 	).sort(sortByAscii);
+	// 数组去重并排序
 };
 
 const sortByAscii = (a: string, b: string) => {
@@ -351,10 +337,7 @@ const fn = () => {
 let checkBuildEnd: () => void;
 const moduleIds: string[] = [];
 
-const findChildren = (
-	id: string,
-	getModuleInfo: PluginContext["getModuleInfo"],
-) => {
+const findChildren = (id: string, getModuleInfo: GetModuleInfo) => {
 	const queue = [id];
 	while (queue.length > 0) {
 		const id = queue.shift();
@@ -377,10 +360,15 @@ const findChildren = (
 const asyncOptimizeChunkPlugin = (): Plugin => {
 	return {
 		name: "asyncOptimizeChunkPlugin",
+		buildStart() {
+			checkBuildEnd = fn();
+		},
 		moduleParsed(this, info) {
+			// 模块解析后调用
 			const { id } = info;
 			if (id.includes("chunkName")) {
 				const { importedIds, dynamicallyImportedIds } = info;
+				// id是当前在处理的文件，importedIds是静态导入的模块列表, dynamicallyImportedIds动态导入的模块
 				const chunkName = id.includes("client-entry")
 					? "client-entry"
 					: chunkNameRe.exec(id)![1];
@@ -392,17 +380,14 @@ const asyncOptimizeChunkPlugin = (): Plugin => {
 				}
 			}
 		},
-		buildStart() {
-			checkBuildEnd = fn();
-		},
 		transform(this, code, id) {
 			moduleIds.push(id);
 			logWarning(`build optimize process file ${id}`);
 			checkBuildEnd();
 		},
 		async buildEnd(this, err) {
-			// after the first layer file can be located in which chunkName
-			// confirm all children dependence belong to which chunkName
+			// 在第一层文件可以确定属于哪个chunkName之后
+			// 确认所有子依赖属于哪个chunkName
 
 			Object.keys(dependenciesMap).forEach((item) => {
 				const id = !isAbsolute(item) ? filePathMap[item] : item;
@@ -466,7 +451,6 @@ const manifestPlugin = (): Plugin => {
 	return {
 		name: "manifestPlugin",
 		async generateBundle(_, bundles) {
-			console.log("%c Line:448 🍔", "color:#fff;background:#7f2b82");
 			if (optimize) return;
 			const manifest: Record<string, string> = {};
 			for (const bundle in bundles) {
@@ -545,6 +529,7 @@ const manualChunksFn = (id: string) => {
 			return "Page";
 		}
 		const arr = dependenciesMap[sign] ?? [];
+		console.log("%c Line:548 🍬 arr", "color:#fff;background:#93c0a4", arr);
 		if (arr.length === 1) {
 			return arr[0];
 		} else if (arr.length >= 2) {

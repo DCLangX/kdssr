@@ -99,19 +99,19 @@ yargs(hideBin(process.argv))
 		"Start Server",
 		(yargs) =>
 			yargs.options({
-				bundleConfig: {
-					type: "boolean",
-					alias: "bc",
-					desc: "bundle config.ts dependencies module by esbuild",
-				},
-				bundleConfigPlatform: {
-					type: "boolean",
-					alias: "bcp",
-					desc: "esbuild bundle platform",
-				},
-				vite: {
-					desc: "Start application by vite",
-				},
+				// bundleConfig: {
+				// 	type: "boolean",
+				// 	alias: "bc",
+				// 	desc: "bundle config.ts dependencies module by esbuild",
+				// },
+				// bundleConfigPlatform: {
+				// 	type: "boolean",
+				// 	alias: "bcp",
+				// 	desc: "esbuild bundle platform",
+				// },
+				// vite: {
+				// 	desc: "Start application by vite",
+				// },
 				viteMode: {
 					desc: "same like vite start --mode",
 				},
@@ -131,12 +131,12 @@ yargs(hideBin(process.argv))
 				"color:#fff;background:#ed9ec7",
 				argv,
 			);
-			if (argv.bc) {
-				process.env.BUNDLECONFIG = "1";
-			}
-			if (argv.bcp) {
-				process.env.BUNDLECONFIGPLATFORM = argv.bcp;
-			}
+			// if (argv.bc) {
+			// 	process.env.BUNDLECONFIG = "1";
+			// }
+			// if (argv.bcp) {
+			// 	process.env.BUNDLECONFIGPLATFORM = argv.bcp;
+			// }
 			await startFunc(argv);
 		},
 	)
@@ -145,23 +145,23 @@ yargs(hideBin(process.argv))
 		"Build application by webpack or vite",
 		(yargs) =>
 			yargs.options({
-				bundleConfig: {
-					alias: "bc",
-					desc: "bundle config.ts dependencies module by esbuild",
-				},
-				bundleConfigPlatform: {
-					alias: "bcp",
-					desc: "esbuild bundle platform",
-				},
-				vite: {
-					desc: "Build application by vite",
-				},
+				// bundleConfig: {
+				// 	alias: "bc",
+				// 	desc: "bundle config.ts dependencies module by esbuild",
+				// },
+				// bundleConfigPlatform: {
+				// 	alias: "bcp",
+				// 	desc: "esbuild bundle platform",
+				// },
+				// vite: {
+				// 	desc: "Build application by vite",
+				// },
 				viteMode: {
 					desc: "same like vite build --mode",
 				},
-				legacy: {
-					desc: "Close default rollup manulChunks setting in vite mode",
-				},
+				// legacy: {
+				// 	desc: "Close default rollup manulChunks setting in vite mode",
+				// },
 				html: {
 					desc: "Build application as a single html",
 				},
@@ -183,12 +183,12 @@ yargs(hideBin(process.argv))
 			// to get a stable bundle result but maybe some performance loss
 			// `);
 			// }
-			if (argv.bc) {
-				process.env.BUNDLECONFIG = "1";
-			}
-			if (argv.bcp) {
-				process.env.BUNDLECONFIGPLATFORM = argv.bcp;
-			}
+			// if (argv.bc) {
+			// 	process.env.BUNDLECONFIG = "1";
+			// }
+			// if (argv.bcp) {
+			// 	process.env.BUNDLECONFIGPLATFORM = argv.bcp;
+			// }
 			await buildFunc(argv);
 		},
 	)

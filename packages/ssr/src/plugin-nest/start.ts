@@ -31,11 +31,6 @@ const start = async (argv: Argv) =>
 			singleDash,
 			doubleDash,
 		});
-		console.log(
-			"%c Line:36 🌭 normalizeArgv",
-			"color:#fff;background:#fca650",
-			normalizeArgv,
-		);
 		const { stdout, stderr } = exec(
 			`${resolve(cwd, "./node_modules/.bin/nest")} start --watch ${normalizeArgv}`,
 			{

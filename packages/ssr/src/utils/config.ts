@@ -1,16 +1,18 @@
 import shell from "shelljs";
 import { transform } from "esbuild";
-import { accessFile, accessFileSync, getCwd, getFeDir } from "./";
-import { resolve, join } from "path";
-import { promises } from "fs";
+import { accessFile, accessFileSync, getCwd, getFeDir } from "./file";
+import { resolve, join } from "node:path";
+import { promises } from "node:fs";
 import type { IConfig, UserConfig } from "./types";
-import { createRequire } from "module";
+import { createRequire } from "node:module";
 import { normalizeEndPath, normalizeStartPath } from "./normalize";
+const require = createRequire(getCwd());
+
 const { mkdir, cp } = shell;
 export const getStaticConfig = () => {
-	const staticConfigPath = resolve(getCwd(), "./build/staticConfig.js");
+	const staticConfigPath = resolve(getCwd(), "./build/staticConfig.cjs");
 	const staticConfig = accessFileSync(staticConfigPath)
-		? (createRequire(staticConfigPath) as UserConfig)
+		? (require(staticConfigPath) as UserConfig)
 		: {};
 	return staticConfig;
 };
@@ -25,7 +27,7 @@ export const transformConfig = async () => {
 		cp(
 			"-r",
 			`${resolve(cwd, "./config.js")}`,
-			`${resolve(cwd, "./build/config.js")}`,
+			`${resolve(cwd, "./build/config.cjs")}`,
 		);
 	}
 	const configWithTs = await accessFile(resolve(cwd, "./config.ts"));
@@ -38,14 +40,14 @@ export const transformConfig = async () => {
 			format: "cjs",
 			keepNames: true,
 		});
-		await promises.writeFile(resolve(cwd, "./build/config.js"), code);
+		await promises.writeFile(resolve(cwd, "./build/config.cjs"), code);
 	}
 };
 
 const getUserConfig = (): UserConfig => {
-	const defaultConfig = resolve(getCwd(), "./build/config.js");
+	const defaultConfig = resolve(getCwd(), "./build/config.cjs");
 	return accessFileSync(defaultConfig)
-		? (createRequire(defaultConfig) as UserConfig)
+		? require(defaultConfig).userConfig
 		: {}; // for dynamic file
 };
 type Json = string | number | boolean | { [key: string]: Json };
@@ -236,4 +238,23 @@ export const loadConfig = (): IConfig => {
 	config.hmr = hmr;
 
 	return config;
+};
+
+export const getOutputPublicPath = () => {
+	// return /client/
+	const { publicPath, isDev } = loadConfig();
+	const path = normalizeEndPath(publicPath);
+	return isDev ? path : `${path}client/`;
+};
+
+export const getImageOutputPath = () => {
+	const { publicPath, isDev, assetsDir } = loadConfig();
+	const imagePath = `${assetsDir}/images`;
+	const normalizePath = normalizeEndPath(publicPath);
+	return {
+		publicPath: isDev
+			? `${normalizePath}${imagePath}`
+			: `${normalizePath}client/${imagePath}`,
+		imagePath,
+	};
 };

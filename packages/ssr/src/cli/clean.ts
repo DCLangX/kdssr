@@ -24,11 +24,11 @@ export const cleanOutDir = async (argv: Argv) => {
 	if (tsconfigExist && process.env.CLEAN !== "false") {
 		try {
 			const tsconfig = await import(
-				pathToFileURL(resolve(cwd, "./tsconfig.json")).href
+				pathToFileURL(resolve(cwd, "./tsconfig.json")).href,
+				{ assert: { type: "json" } }
 			);
-			const outDir = tsconfig.compilerOptions.outDir;
+			const outDir = tsconfig.default.compilerOptions.outDir;
 			rm("-rf", resolve(cwd, outDir));
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		} catch (error) {
 			// 有可能 json 文件存在注释导致 require 失败，这里 catch 一下
 			console.log("检测到当前目录 tsconfig.json 文件可能存在语法错误");

@@ -1,8 +1,6 @@
 import { accessSync, promises } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-import { loadConfig } from "./config";
-import { normalizeEndPath } from "./normalize";
 
 export const accessFile = async (file: string) => {
 	const result = await promises
@@ -40,23 +38,4 @@ export function getDirname(url: string) {
 
 export const getPagesDir = () => {
 	return resolve(getFeDir(), "pages");
-};
-
-export const getOutputPublicPath = () => {
-	// return /client/
-	const { publicPath, isDev } = loadConfig();
-	const path = normalizeEndPath(publicPath);
-	return isDev ? path : `${path}client/`;
-};
-
-export const getImageOutputPath = () => {
-	const { publicPath, isDev, assetsDir } = loadConfig();
-	const imagePath = `${assetsDir}/images`;
-	const normalizePath = normalizeEndPath(publicPath);
-	return {
-		publicPath: isDev
-			? `${normalizePath}${imagePath}`
-			: `${normalizePath}client/${imagePath}`,
-		imagePath,
-	};
 };
