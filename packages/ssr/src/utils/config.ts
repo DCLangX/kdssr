@@ -149,8 +149,6 @@ export const loadConfig = (): IConfig => {
 
 	const host = hmr?.host ?? "127.0.0.1";
 
-	const chunkName = "Page";
-
 	const useHash = !isDev; // 生产环境默认生成hash
 	const defaultWhiteList: (RegExp | string)[] = [
 		/\.(css|less|sass|scss)$/,
@@ -164,12 +162,14 @@ export const loadConfig = (): IConfig => {
 		userConfig.whiteList ?? [],
 	);
 
-	const jsOrder = [`${chunkName}.js`];
+	const rootChunkName = "Page";
+
+	const jsOrder = [`${rootChunkName}.js`];
 
 	const cssOrder = [
 		"vendor.css",
 		"common-vendor.css",
-		`${chunkName}.css`,
+		`${rootChunkName}.css`,
 		"layout-app.css",
 	];
 
@@ -183,7 +183,7 @@ export const loadConfig = (): IConfig => {
 	const proxyKey = [staticPath, hotUpdatePath, manifestPath];
 	const prefix = "/";
 	const dynamicFile = {
-		serverBundle: join(cwd, `./build/server/${chunkName}.server.js`),
+		serverBundle: join(cwd, `./build/server/${rootChunkName}.server.js`),
 		assetManifest: join(cwd, "./build/client/asset-manifest.json"),
 		asyncChunkMap: join(cwd, "./build/asyncChunkMap.json"),
 	};
@@ -205,7 +205,6 @@ export const loadConfig = (): IConfig => {
 			moduleFileExtensions,
 			fePort,
 			serverPort,
-			chunkName,
 			jsOrder,
 			cssOrder,
 			dynamic,

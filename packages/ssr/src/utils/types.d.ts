@@ -20,7 +20,6 @@ export interface IConfig {
 	host: string;
 	fePort: number;
 	serverPort: number;
-	chunkName: string;
 	getOutput: () => {
 		clientOutPut: string;
 		serverOutPut: string;
@@ -28,7 +27,7 @@ export interface IConfig {
 	cssInline?: "all" | string[];
 	assetsDir?: string;
 	proxy?: any;
-	cssOrder: string[];
+	cssOrder: string[]; // css默认顺序
 	jsOrder: string[];
 	extraJsOrder?: ((ctx: ISSRContext) => string[]) | string[] | undefined;
 	extraCssOrder?: ((ctx: ISSRContext) => string[]) | string[] | undefined;

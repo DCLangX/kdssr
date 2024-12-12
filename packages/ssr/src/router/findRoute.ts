@@ -5,8 +5,13 @@ const cache = {};
 const cacheLimit = 10000;
 let cacheCount = 0;
 
+/**
+ * @description: 将一个路径字符串转换成正则表达式对象
+ * @param {*} path
+ * @param {*} options
+ * @return {*}
+ */
 function compilePath(path, options) {
-	console.log("%c Line:9 🍔 path", "color:#fff;background:#4fff4B", path);
 	const cacheKey = `${options.end}${options.strict}${options.sensitive}`;
 	const pathCache = cache[cacheKey] || (cache[cacheKey] = {});
 
@@ -14,7 +19,10 @@ function compilePath(path, options) {
 
 	const keys = [];
 	const result = pathToRegexp(path, keys, options);
-	// const result = { regexp, keys };
+	// pathToRegexp 函数会将路径中的参数（如 :id）转换为正则表达式，并提取参数名存储在 keys 数组中
+	// const [regexp, keys] = result;
+	// console.log(regexp); // path = '/user/:id'，输出: /user(?:\/([^\/]+?))
+	// console.log(keys);   // path = '/user/:id'，输出: [{ name: 'id', prefix: '/', delimiter: '/', optional: false, repeat: false }]
 
 	if (cacheCount < cacheLimit) {
 		pathCache[path] = result;
@@ -24,21 +32,27 @@ function compilePath(path, options) {
 	return result;
 }
 
+/**
+ * @description: 检测路径匹配的函数
+ * @param {*} pathname 要匹配的路径字符串，例如 "/about"
+ * @param {*} options 前端路由条目对象，如果是一个字符串或字符串数组，此时会被转换成 { path: options } 的形式
+ * @return {Object} 返回一个对象，包含匹配结果的相关信息
+ */
 function matchPath(pathname, options = {}) {
 	if (typeof options === "string" || Array.isArray(options)) {
 		options = { path: options };
 	}
 
 	const {
-		path,
-		exact = false,
-		strict = false,
+		path, // 目前仅有path被用到，其余均为无效参数
+		exact = false, //表示是否需要精确匹配整个路径
+		strict = false, //表示是否在路径末尾需要严格匹配
 		sensitive = false,
 		childPath,
 	} = options;
 
 	const paths = [].concat(childPath || path);
-
+	// 所有文件路由在前面已经被处理成顶层对象，使用完整路径的path，所以原则上只有手动写的才会有childPath
 	return paths.reduce((matched, path) => {
 		if (!path && path !== "") return null;
 		if (matched) return matched;
@@ -48,7 +62,7 @@ function matchPath(pathname, options = {}) {
 			strict,
 			sensitive,
 		});
-		console.log("%c Line:47 🧀 regexp", "color:#fff;background:#ea7e5c", regexp);
+
 		const match = regexp.exec(pathname);
 
 		if (!match) return null;
@@ -59,9 +73,9 @@ function matchPath(pathname, options = {}) {
 		if (exact && !isExact) return null;
 
 		return {
-			path, // the path used to match
-			url: path === "/" && url === "" ? "/" : url, // the matched portion of the URL
-			isExact, // whether or not we matched exactly
+			path, // 用于匹配的路径
+			url: path === "/" && url === "" ? "/" : url, // URL的匹配部分
+			isExact, // 是否完全匹配
 			params: keys.reduce((memo, key, index) => {
 				memo[key.name] = values[index];
 				return memo;
@@ -75,6 +89,7 @@ function findRoute<
 >(Routes: T[], path: string): T {
 	// 根据请求的path来匹配到对应的Component
 	const p = path.includes("?") ? path.split("?")[0] : path;
+	// 取出path问号前的字符串
 	const route = Routes.find((route) => {
 		return route.children
 			? findRoute(route.children, p)

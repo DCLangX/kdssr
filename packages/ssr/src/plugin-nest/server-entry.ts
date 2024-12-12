@@ -54,10 +54,13 @@ const serverRender = async (
 	const router = createRouter();
 	const pinia = createPinia();
 	const rawPath = ctx.request.path ?? ctx.request.url;
+	// 尽量取到不含问号参数的url，比如这样/detail/cbba934b14f747049187
 	const [path, url] = [
 		normalizePath(rawPath, prefix),
 		normalizePath(ctx.request.url, prefix),
 	];
+	// 移除设置的url前缀，以便匹配到正确的路由
+
 	const routeItem = findRoute<IFeRouteItem>(FeRoutes, path);
 	checkRoute({ routeItem, path });
 
@@ -166,8 +169,9 @@ const serverRender = async (
 	const fn = async () => {
 		const { fetch, chunkName } = routeItem;
 		const dynamicCssOrder = await getAsyncCssChunk(ctx, chunkName, config);
+		// 获取依赖的css文件名列表
 		console.log(
-			"%c Line:166 🥒 dynamicCssOrder",
+			"%c Line:166 🥒 finallyCssOrder",
 			"color:#fff;background:#33a5ff",
 			dynamicCssOrder,
 		);
@@ -177,12 +181,15 @@ const serverRender = async (
 			ctx.modules,
 		);
 		const dynamicJsOrder = await getAsyncJsChunk(ctx, chunkName, config);
+		// 获取依赖的js文件名列表
 		const manifest = await getManifest(config);
+		// 获取文件名对应文件路径的对象
 		const [inlineCssOrder, extraCssOrder] = await getInlineCss({
 			dynamicCssOrder,
 			manifest,
 			config,
 		});
+		// 拆解出内联css和外联css
 		console.log(
 			"%c Line:182 🍊 inlineCssOrder",
 			"color:#fff;background:#42b983",
@@ -258,12 +265,15 @@ const serverRender = async (
 			const lF = layoutFetch
 				? layoutFetch({ router: value, ctx, pinia }, ctx)
 				: Promise.resolve({});
+			// layoutFetch
 			const CF = currentFetch
 				? currentFetch({ router: value, ctx, pinia }, ctx)
 				: Promise.resolve({});
+			// 页面fetch
 			[layoutFetchData, fetchData] = parallelFetch
 				? await Promise.all([lF, CF])
 				: [await lF, await CF];
+			// 是否并行执行
 		} else {
 			logGreen(`Current path ${path} use csr render mode`);
 		}

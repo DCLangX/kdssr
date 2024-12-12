@@ -38,6 +38,13 @@ export const splitPageInfo = (
 		delimiter: ";",
 	});
 
+/**
+ * @description: 读取之前的vite插件打包时生成的./build/asyncChunkMap.json文件，仅生产打包才有
+ * @param {IConfig} config
+ * @param {*} Promise
+ * @param {*} string
+ * @return {*}
+ */
 const readAsyncChunk = async (
 	config: IConfig,
 ): Promise<Record<string, string>> => {
@@ -51,8 +58,15 @@ const readAsyncChunk = async (
 		return {};
 	}
 };
+/**
+ * @description: 根据chunkName获取打包时对应的css或js资源文件
+ * @param {string} chunkName
+ * @param {IConfig} config
+ * @param {*} type
+ * @return {*}
+ */
 const addAsyncChunk = async (
-	webpackChunkName: string,
+	chunkName: string,
 	config: IConfig,
 	type: "css" | "js",
 ) => {
@@ -60,15 +74,27 @@ const addAsyncChunk = async (
 	const asyncChunkMap = await readAsyncChunk(config);
 	for (const key in asyncChunkMap) {
 		if (
-			asyncChunkMap[key].includes(webpackChunkName) ||
+			asyncChunkMap[key].includes(chunkName) ||
 			asyncChunkMap[key].includes("client-entry")
 		) {
 			arr.push(`${key}.${type}`);
 		}
 	}
+	console.log(
+		"%c Line:84 🥚 addAsyncChunk",
+		"color:#fff;background:#33a5ff",
+		arr,
+	);
 	return arr;
 };
 
+/**
+ * @description: 处理自定义顺序，如果传入的是函数，则执行函数，否则直接返回数组
+ * @param {UserConfig.extraJsOrder} order
+ * @param {ISSRContext} ctx
+ * @param {*} string
+ * @return {*} 返回要加载的文件名的数组
+ */
 export const nomalrizeOrder = (
 	order: UserConfig["extraJsOrder"],
 	ctx: ISSRContext,
@@ -96,21 +122,35 @@ export const getDefineEnv = () => {
 	return envObject;
 };
 
+/**
+ * @description: 获取路由的chunkName所需的css文件
+ * @param {ISSRContext} ctx
+ * @param {string} chunkName
+ * @param {IConfig} config
+ * @param {*} Promise
+ * @return {*}
+ */
 export const getAsyncCssChunk = async (
 	ctx: ISSRContext,
-	webpackChunkName: string,
+	chunkName: string,
 	config: IConfig,
 ): Promise<string[]> => {
 	const { cssOrder, extraCssOrder, cssOrderPriority } = config;
 	const combineOrder = cssOrder.concat([
 		...nomalrizeOrder(extraCssOrder, ctx),
-		...(await addAsyncChunk(webpackChunkName, config, "css")),
-		`${webpackChunkName}.css`,
+		...(await addAsyncChunk(chunkName, config, "css")),
+		`${chunkName}.css`,
 	]);
+	console.log(
+		"%c Line:135 🌰 combineOrder",
+		"color:#fff;background:#3f7cff",
+		combineOrder,
+	);
+	// 以上获取到了默认的和自定义的所有css列表，接下来进行排序
 	if (cssOrderPriority) {
 		const priority =
 			typeof cssOrderPriority === "function"
-				? cssOrderPriority({ chunkName: webpackChunkName })
+				? cssOrderPriority({ chunkName })
 				: cssOrderPriority;
 		combineOrder.sort((a, b) => {
 			// 没有显示指定的路由优先级统一为 0
@@ -121,18 +161,18 @@ export const getAsyncCssChunk = async (
 };
 export const getAsyncJsChunk = async (
 	ctx: ISSRContext,
-	webpackChunkName: string,
+	chunkName: string,
 	config: IConfig,
 ): Promise<string[]> => {
 	const { jsOrder, extraJsOrder, jsOrderPriority } = config;
 	const combineOrder = jsOrder.concat([
 		...nomalrizeOrder(extraJsOrder, ctx),
-		...(await addAsyncChunk(webpackChunkName, config, "js")),
+		...(await addAsyncChunk(chunkName, config, "js")),
 	]);
 	if (jsOrderPriority) {
 		const priority =
 			typeof jsOrderPriority === "function"
-				? jsOrderPriority({ chunkName: webpackChunkName })
+				? jsOrderPriority({ chunkName })
 				: jsOrderPriority;
 		combineOrder.sort((a, b) => {
 			// 没有显示指定的路由优先级统一为 0
@@ -164,6 +204,12 @@ export const getScriptArr = (
 ) => {
 	return Array.isArray(script) ? script : (script?.(ctx) ?? []);
 };
+/**
+ * @description: 处理需要内联的css，inlineCssContent存放所有内联的css内容，cssInjectOrder存放普通的css文件名
+ * @param {array} dynamicCssOrder 需要加载的css文件名列表
+ * @param {array} manifest 存放css文件名对应的具体文件路径
+ * @return {*}
+ */
 export const getInlineCss = async ({
 	dynamicCssOrder,
 	manifest,
@@ -229,6 +275,13 @@ export const getInlineCss = async ({
 	return [inlineCssContent, cssInjectOrder];
 };
 
+/**
+ * @description: 获取manifest
+ * @param {IConfig} config
+ * @param {*} Promise
+ * @param {*} string
+ * @return {*}
+ */
 export const getManifest = async (
 	config: IConfig,
 ): Promise<Record<string, string | undefined>> => {
