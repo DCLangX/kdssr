@@ -62,10 +62,7 @@ const parseFeRoutes = async () => {
 	routes = routes.replace(/"component":("(.+?)")/g, (global, m1, m2) => {
 		const chunkName = re.exec(routes)[2];
 		if (dynamic) {
-			return `"component": function dynamicComponent () {
-          return import(/* chunkTypeName: "${chunkName}" */ '${m2.replace(/\^/g, '"')}')
-        }
-        `;
+			return `"component": () => import(/* chunkTypeName: "${chunkName}" */ '${m2.replace(/\^/g, '"')}')`;
 		} else {
 			return `"component": import('${m2.replace(/\^/g, '"')}')`;
 		}

@@ -5,6 +5,7 @@ import {
 	manifestPlugin,
 	rollupOutputOptions,
 } from "./vite-config-plugin";
+import assetManifestPlugin from "./rollup-plugin";
 // import {
 // 	loadConfig,
 // 	chunkNamePlugin,
@@ -114,7 +115,6 @@ const viteStart = async () => {
 	//
 };
 const viteBuild = async () => {
-	console.log("%c Line:118 🍆", "color:#fff;background:#465975");
 	await build({
 		mode: process.env.VITEMODE ?? "production",
 		build: {
@@ -123,9 +123,10 @@ const viteBuild = async () => {
 			rollupOptions: {
 				output: rollupOutputOptions(),
 				plugins: [
-					chunkNamePlugin(),
-					asyncOptimizeChunkPlugin(),
-					manifestPlugin(),
+					// chunkNamePlugin(),
+					// asyncOptimizeChunkPlugin(),
+					// manifestPlugin(),
+					assetManifestPlugin(),
 				],
 			},
 		},

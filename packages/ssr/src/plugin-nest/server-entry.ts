@@ -169,7 +169,7 @@ const serverRender = async (
 	const fn = async () => {
 		const { fetch, chunkName } = routeItem;
 		const dynamicCssOrder = await getAsyncCssChunk(ctx, chunkName, config);
-		// 获取依赖的css文件名列表
+		// 获取依赖的css文件列表
 		console.log(
 			"%c Line:166 🥒 finallyCssOrder",
 			"color:#fff;background:#33a5ff",
@@ -181,7 +181,7 @@ const serverRender = async (
 			ctx.modules,
 		);
 		const dynamicJsOrder = await getAsyncJsChunk(ctx, chunkName, config);
-		// 获取依赖的js文件名列表
+		// 获取依赖的js文件列表
 		const manifest = await getManifest(config);
 		// 获取文件名对应文件路径的对象
 		const [inlineCssOrder, extraCssOrder] = await getInlineCss({
@@ -210,28 +210,22 @@ const serverRender = async (
 							src: "/@vite/client",
 						}),
 					]
-				: extraCssOrder
-						.map((css) => manifest[css])
-						.filter(Boolean)
-						.map((css) =>
-							h("link", {
-								rel: "stylesheet",
-								href: css,
-							}),
-						)
+				: extraCssOrder.filter(Boolean).map((css) =>
+						h("link", {
+							rel: "stylesheet",
+							href: css,
+						}),
+					)
 		).concat(
 			isDev
 				? []
-				: dynamicJsOrder
-						.map((js) => manifest[js])
-						.filter(Boolean)
-						.map((js) =>
-							h("link", {
-								href: js,
-								as: "script",
-								rel: "modulepreload",
-							}),
-						),
+				: dynamicJsOrder.filter(Boolean).map((js) =>
+						h("link", {
+							href: js,
+							as: "script",
+							rel: "modulepreload",
+						}),
+					),
 		);
 		console.log(
 			"%c Line:197 🌰 cssInject",
@@ -246,15 +240,12 @@ const serverRender = async (
 						src: "/node_modules/kdssr/dist/plugin-vue3/client-entry.mjs",
 					}),
 				]
-			: dynamicJsOrder
-					.map((js) => manifest[js])
-					.filter(Boolean)
-					.map((js) =>
-						h("script", {
-							src: js,
-							type: "module",
-						}),
-					);
+			: dynamicJsOrder.filter(Boolean).map((js) =>
+					h("script", {
+						src: js,
+						type: "module",
+					}),
+				);
 		let [layoutFetchData, fetchData] = [{}, {}];
 		if (!isCsr && !bigpipe) {
 			// not fetch when generate <head>

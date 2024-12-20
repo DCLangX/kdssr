@@ -30,6 +30,7 @@ export default defineBuildConfig([
 		 * * `undefined` will auto detect based on "package.json". If "package.json" has "types" field, it will be `"compatible"`, otherwise `false`.
 		 */
 		declaration: "compatible",
+		failOnWarn: false,
 		clean: true,
 		sourcemap: true,
 		externals: [

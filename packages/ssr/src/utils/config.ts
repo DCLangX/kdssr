@@ -177,14 +177,14 @@ export const loadConfig = (): IConfig => {
 	const writeDebounceTime = 2000;
 
 	const assetsDir = userConfig.assetsDir ?? "static";
-	const manifestPath = `${normalizeEndPath(devPublicPath)}asset-manifest.json`;
+	const manifestPath = `${normalizeEndPath(devPublicPath)}assets-manifest.json`;
 	const staticPath = `${normalizeEndPath(devPublicPath)}${assetsDir}`;
 	const hotUpdatePath = `${normalizeEndPath(devPublicPath)}*.hot-update**`;
 	const proxyKey = [staticPath, hotUpdatePath, manifestPath];
 	const prefix = "/";
 	const dynamicFile = {
 		serverBundle: join(cwd, `./build/server/${rootChunkName}.server.js`),
-		assetManifest: join(cwd, "./build/client/asset-manifest.json"),
+		assetManifest: join(cwd, "./build/client/assets-manifest.json"),
 		asyncChunkMap: join(cwd, "./build/asyncChunkMap.json"),
 	};
 	const staticConfigPath = join(cwd, "./build/staticConfig.js");

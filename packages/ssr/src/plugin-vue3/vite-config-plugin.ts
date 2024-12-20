@@ -177,36 +177,16 @@ export function getPkgName(modulePath: string, packageFolder = "node_modules") {
 }
 
 export const getBuildConfig = () => {
-	const { useHash, assetsDir } = loadConfig();
-	const output = {
-		chunkFileName: useHash
-			? `${assetsDir}/[name].[contenthash:8].chunk.js`
-			: `${assetsDir}/[name].chunk.js`,
-		fileName: useHash
-			? `${assetsDir}/[name].[contenthash:8].js`
-			: `${assetsDir}/[name].js`,
-		cssfileName: useHash
-			? `${assetsDir}/[name].[contenthash:8].css`
-			: `${assetsDir}/[name].css`,
-		cssChunkFilename: useHash
-			? `${assetsDir}/[name].[contenthash:8].chunk.css`
-			: `${assetsDir}/[name].chunk.css`,
-	};
+	const { assetsDir } = loadConfig();
 	return {
-		viteImageChunk: `${assetsDir}/[name].[hash].[ext]`,
+		viteImageChunk: `${assetsDir}/[hash].[ext]`,
 		jsBuldConfig: {
 			fileName: `${assetsDir}/[name].[hash].chunk.js`,
-			chunkFileName: `${assetsDir}/[name].[hash].chunk.js`,
+			chunkFileName: `${assetsDir}/[hash].js`,
 		},
-		viteEntryChunk: `${assetsDir}/Page.[hash].chunk.js`,
-		viteClientEntryChunk: `${assetsDir}/Page.[hash].chunk.[ext]`,
-		viteAssetChunk: `${assetsDir}/[name].[hash].chunk.[ext]`,
-		cssBuildConfig: [
-			{
-				filename: output.cssfileName,
-				chunkFilename: output.cssChunkFilename,
-			},
-		],
+		viteEntryChunk: `${assetsDir}/Page.[hash].js`, //入口文件命名
+		viteClientEntryAssetChunk: `${assetsDir}/Page.[hash].[ext]`, // 客户端入口文件下的静态资源命名
+		viteAssetChunk: `${assetsDir}/[hash].[ext]`,
 	};
 };
 
@@ -278,11 +258,15 @@ const chunkNamePlugin = function (): Plugin {
 
 const filePathMap: Record<string, string> = {};
 
+/**
+ * @description: 将import的文件id记录到dependenciesMap中，值是使用这个import文件的所有父文件的id和处理中的文件的路由模块名
+ * @return {*}
+ */
 const recordInfo = (
-	id: string,
-	chunkName: string | null,
-	defaultChunkName: string | null,
-	parentId: string,
+	id: string, //需要import的文件id
+	chunkName: string | null, //处理中的文件名字的路由模块名，例如D:/项目/前端项目/kdlinkSSR/app/nestjs-vue3-ssr-pinia/web/components/layout/index.vue?chunkName=Page，这里就是Page
+	defaultChunkName: string | null, //给这个import的文件取的默认模块名
+	parentId: string, //处理中的文件名字的模块名，例如D:/项目/前端项目/kdlinkSSR/app/nestjs-vue3-ssr-pinia/web/components/layout/index.vue?chunkName=Page
 ) => {
 	const sign = id.includes("node_modules") ? getPkgName(id) : id;
 	if (id.includes("node_modules")) {
@@ -293,7 +277,6 @@ const recordInfo = (
 		dependenciesMap[sign] = defaultChunkName ? [defaultChunkName] : [];
 	}
 	chunkName && dependenciesMap[sign].push(chunkName);
-	// 记录文件里的依赖类型，结构是{ [key:依赖名] : (模块类型名或"dynamic"或"vendor")[] }
 	if (id.includes("node_modules")) {
 		dependenciesMap[sign].push("vendor");
 	}
@@ -363,10 +346,15 @@ const asyncOptimizeChunkPlugin = (): Plugin => {
 		buildStart() {
 			checkBuildEnd = fn();
 		},
+		transform(this, code, id) {
+			moduleIds.push(id);
+			logWarning(`build optimize process file ${id}`);
+			checkBuildEnd();
+		},
 		moduleParsed(this, info) {
 			// 模块解析后调用
 			const { id } = info;
-			if (id.includes("chunkName")) {
+			if (id.includes("?chunkName")) {
 				const { importedIds, dynamicallyImportedIds } = info;
 				// id是当前在处理的文件，importedIds是静态导入的模块列表, dynamicallyImportedIds动态导入的模块
 				const chunkName = id.includes("client-entry")
@@ -380,15 +368,9 @@ const asyncOptimizeChunkPlugin = (): Plugin => {
 				}
 			}
 		},
-		transform(this, code, id) {
-			moduleIds.push(id);
-			logWarning(`build optimize process file ${id}`);
-			checkBuildEnd();
-		},
 		async buildEnd(this, err) {
 			// 在第一层文件可以确定属于哪个chunkName之后
 			// 确认所有子依赖属于哪个chunkName
-
 			Object.keys(dependenciesMap).forEach((item) => {
 				const id = !isAbsolute(item) ? filePathMap[item] : item;
 				findChildren(id, this.getModuleInfo);
@@ -451,6 +433,11 @@ const manifestPlugin = (): Plugin => {
 	return {
 		name: "manifestPlugin",
 		async generateBundle(_, bundles) {
+			console.log(
+				"%c Line:436 🍣 bundles",
+				"color:#fff;background:#33a5ff",
+				bundles,
+			);
 			if (optimize) return;
 			const manifest: Record<string, string> = {};
 			for (const bundle in bundles) {
@@ -500,7 +487,7 @@ const rollupOutputOptions: () => OutputOptions = () => {
 		chunkFileNames: buildConfig.jsBuldConfig.chunkFileName,
 		assetFileNames: (assetInfo) => {
 			if (assetInfo.name?.includes("client-entry")) {
-				return buildConfig.viteClientEntryChunk;
+				return buildConfig.viteClientEntryAssetChunk;
 			}
 			if (
 				assetInfo.name &&

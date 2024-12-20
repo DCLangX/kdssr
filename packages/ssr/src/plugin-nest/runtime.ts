@@ -71,13 +71,12 @@ const addAsyncChunk = async (
 	type: "css" | "js",
 ) => {
 	const arr = [];
-	const asyncChunkMap = await readAsyncChunk(config);
+	const asyncChunkMap = await getManifest(config);
 	for (const key in asyncChunkMap) {
-		if (
-			asyncChunkMap[key].includes(chunkName) ||
-			asyncChunkMap[key].includes("client-entry")
-		) {
-			arr.push(`${key}.${type}`);
+		if (key === chunkName) {
+			arr.push(
+				...asyncChunkMap[key].filter((item) => item.endsWith(type)),
+			);
 		}
 	}
 	console.log(
@@ -135,12 +134,11 @@ export const getAsyncCssChunk = async (
 	chunkName: string,
 	config: IConfig,
 ): Promise<string[]> => {
-	const { cssOrder, extraCssOrder, cssOrderPriority } = config;
-	const combineOrder = cssOrder.concat([
+	const { extraCssOrder, cssOrderPriority } = config;
+	const combineOrder = [
 		...nomalrizeOrder(extraCssOrder, ctx),
 		...(await addAsyncChunk(chunkName, config, "css")),
-		`${chunkName}.css`,
-	]);
+	];
 	console.log(
 		"%c Line:135 🌰 combineOrder",
 		"color:#fff;background:#3f7cff",
@@ -164,11 +162,11 @@ export const getAsyncJsChunk = async (
 	chunkName: string,
 	config: IConfig,
 ): Promise<string[]> => {
-	const { jsOrder, extraJsOrder, jsOrderPriority } = config;
-	const combineOrder = jsOrder.concat([
+	const { extraJsOrder, jsOrderPriority } = config;
+	const combineOrder = [
 		...nomalrizeOrder(extraJsOrder, ctx),
 		...(await addAsyncChunk(chunkName, config, "js")),
-	]);
+	];
 	if (jsOrderPriority) {
 		const priority =
 			typeof jsOrderPriority === "function"
@@ -216,25 +214,10 @@ export const getInlineCss = async ({
 	config,
 }: {
 	dynamicCssOrder: string[];
-	manifest: Record<string, string | undefined>;
+	manifest: Record<string, string[]>;
 	config: UserConfig;
 }) => {
-	console.log(
-		"%c Line:174 🍤 manifest",
-		"color:#fff;background:#465975",
-		manifest,
-	);
-	console.log(
-		"%c Line:173 🍓 dynamicCssOrder",
-		"color:#fff;background:#2eafb0",
-		dynamicCssOrder,
-	);
 	const { cssInline } = config;
-	console.log(
-		"%c Line:177 🍬 cssInline",
-		"color:#fff;background:#93c0a4",
-		cssInline,
-	);
 	const cwd = getCwd();
 
 	const { cssInlineOrder, cssInjectOrder } =
@@ -260,7 +243,6 @@ export const getInlineCss = async ({
 	const inlineCssContent = (
 		await Promise.all(
 			cssInlineOrder
-				.map((css) => manifest[css])
 				.filter(Boolean)
 				.map((css) =>
 					promises.readFile(
@@ -284,7 +266,7 @@ export const getInlineCss = async ({
  */
 export const getManifest = async (
 	config: IConfig,
-): Promise<Record<string, string | undefined>> => {
+): Promise<Record<string, string[]>> => {
 	const { isDev, dynamicFile } = config;
 	let manifest = {};
 	if (dynamicFile.configFile ?? !isDev) {
