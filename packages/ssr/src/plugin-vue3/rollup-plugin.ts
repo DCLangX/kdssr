@@ -158,12 +158,11 @@ import { parse } from "@babel/parser";
 import traverseDefault from "@babel/traverse";
 
 const traverse = traverseDefault.default;
-
 function routeAssetsPlugin(options = {}) {
 	const {
 		routeFile = "ssr-declare-routes.js",
 		manifestFile = "assets-manifest.json",
-		entryFile = "client-entry.ts", // 添加入口文件配置
+		entryFile = "client-entry.mjs", // 添加入口文件配置
 	} = options;
 
 	const routeAssets = new Map();
@@ -424,7 +423,6 @@ function routeAssetsPlugin(options = {}) {
 					}
 				},
 			});
-
 			console.log("Found routes:", routes);
 
 			routes.forEach((route) => {
