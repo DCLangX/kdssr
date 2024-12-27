@@ -73,11 +73,6 @@ async function render(ctx: ISSRContext, options?: UserConfig) {
 		ctx,
 	).concat(getCustomScript(options?.customeFooterScript, ctx));
 
-	// const { isDev } = config;
-	// if (!isDev && options?.dynamicFile?.assetManifest) {
-	// 	config.isVite = !!createRequire(options.dynamicFile.assetManifest).vite;
-	// }
-
 	setHeader(ctx);
 
 	const serverRes: RenderRes = await viteRender(ctx, config);

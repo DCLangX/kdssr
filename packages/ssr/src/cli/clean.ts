@@ -25,7 +25,7 @@ export const cleanOutDir = async (argv: Argv) => {
 		try {
 			const tsconfig = await import(
 				pathToFileURL(resolve(cwd, "./tsconfig.json")).href,
-				{ assert: { type: "json" } }
+				{ with: { type: "json" } }
 			);
 			const outDir = tsconfig.default.compilerOptions.outDir;
 			rm("-rf", resolve(cwd, outDir));
