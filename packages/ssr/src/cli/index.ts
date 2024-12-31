@@ -31,22 +31,14 @@ const cliDesc = {
 		desc: "only start server plugin",
 	},
 };
-console.log(
-	"%c Line:58 🍐 process.argv",
-	"color:#fff;background:#4fff4B",
-	process.argv,
-);
+
 const startFunc = async (argv: Argv) => {
 	spinner.start();
 	await cleanOutDir(argv);
 	process.env.NODE_ENV = "development";
-	// const { parseFeRoutes, transformConfig, logInfo } = await import(
-	// 	"ssr-common-utils"
-	// );
+
 	await transformConfig();
-	// if (argv.vite) {
 	logInfo("Vite 场景本地开发样式闪烁为正常现象请忽略，生产环境无此问题");
-	// }
 	// const watcher = await createWatcher();
 	await handleEnv(argv);
 	await parseFeRoutes();
@@ -71,21 +63,13 @@ const startOrBuild = async (argv: Argv, type: "start" | "build") => {
 	if (!argv.api) {
 		const client = clientPlugin();
 		await client?.[type]?.().catch((err) => {
-			console.log(
-				"%c Line:68 🌽 err",
-				"color:#fff;background:#465975",
-				err,
-			);
+			console.error("客户端渲染错误", err);
 		});
 	}
 	if (!argv.web) {
 		const server = serverPlugin();
 		await server?.[type]?.(argv).catch((err) => {
-			console.log(
-				"%c Line:68 🌽 err",
-				"color:#fff;background:#465975",
-				err,
-			);
+			console.error("服务端渲染错误", err);
 		});
 	}
 	if (type === "build") {
@@ -222,10 +206,10 @@ yargs(hideBin(process.argv))
 	.alias("v", "version")
 	.fail((msg, err) => {
 		if (err) {
-			console.log(err);
+			console.error(err);
 			spinner.stop();
 			process.exit(1);
 		}
-		console.log(msg);
+		console.error(msg);
 	})
 	.parse();

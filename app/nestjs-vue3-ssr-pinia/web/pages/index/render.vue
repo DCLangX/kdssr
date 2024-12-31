@@ -1,6 +1,10 @@
 <template>
 	<div class="p-20">
 		<Search />
+		<form>
+			<div>dwdw</div>
+			<div>pppp</div>
+		</form>
 		<template v-if="indexData">
 			<Slider :data="indexData[0].components" />
 			<Rectangle :data="indexData[1].components" />
@@ -19,7 +23,9 @@ import { useIndexStore } from "@/pinia-store";
 import Slider from "@/components/slider/index.vue";
 import Rectangle from "@/components/rectangle/index.vue";
 import Search from "@/components/search/index.vue";
-
+import { useRoute, useRouter } from "vue-router";
+const route = useRoute();
+console.log("%c Line:276 🥃 route", "color:#fff;background:#4fff4B", route);
 const indexStore = useIndexStore();
 const indexData = indexStore.data;
 </script>

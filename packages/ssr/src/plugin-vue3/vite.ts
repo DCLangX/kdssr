@@ -5,6 +5,7 @@ import {
 	manifestPlugin,
 	rollupOutputOptions,
 } from "./vite-config-plugin";
+import assetManifestPlugin from "./rollup-plugin";
 // import {
 // 	loadConfig,
 // 	chunkNamePlugin,
@@ -114,18 +115,19 @@ const viteStart = async () => {
 	//
 };
 const viteBuild = async () => {
-	console.log("%c Line:118 🍆", "color:#fff;background:#465975");
 	await build({
 		mode: process.env.VITEMODE ?? "production",
 		build: {
 			ssrManifest: true,
+			modulePreload: { polyfill: false, resolveDependencies: () => [] },
 			outDir: "build/client",
 			rollupOptions: {
 				output: rollupOutputOptions(),
 				plugins: [
-					chunkNamePlugin(),
-					asyncOptimizeChunkPlugin(),
-					manifestPlugin(),
+					// chunkNamePlugin(),
+					// asyncOptimizeChunkPlugin(),
+					// manifestPlugin(),
+					assetManifestPlugin(),
 				],
 			},
 		},
@@ -134,6 +136,7 @@ const viteBuild = async () => {
 		mode: process.env.VITEMODE ?? "production",
 		build: {
 			ssr: true,
+			modulePreload: { polyfill: false, resolveDependencies: () => [] },
 			outDir: "build/server",
 			rollupOptions: {
 				input: "kdssr/server-entry", // setting prebundle list by client-entry in dev

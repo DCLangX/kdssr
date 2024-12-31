@@ -1,7 +1,7 @@
 import { h, createSSRApp, createApp, reactive, renderSlot } from "vue";
 // import { Store } from 'vuex'
 import { RouteLocationNormalizedLoaded } from "vue-router";
-import { setPinia, setApp } from "./client-store";
+// import { setPinia, setApp } from "./client-store";
 import { findRoute } from "../router/findRoute";
 import { createPinia, Pinia } from "pinia";
 import { createRouter } from "../router/create";
@@ -33,7 +33,7 @@ async function getAsyncCombineData(
 	return Object.assign({}, layoutFetchData ?? {}, fetchData ?? {});
 }
 
-const clientRender = async () => {
+const clientRender = () => {
 	// const store = createStore()
 	const router = createRouter({
 		base: window.prefix,
@@ -41,7 +41,7 @@ const clientRender = async () => {
 	});
 	const pinia = createPinia();
 	// setStore(store)
-	setPinia(pinia);
+	// setPinia(pinia);
 
 	const create = window.__USE_SSR__ ? createSSRApp : createApp;
 
@@ -53,12 +53,12 @@ const clientRender = async () => {
 	}
 
 	const asyncData = reactive({
-		value: window.__INITIAL_DATA__ ?? {},
+		value: window.__INITIAL_PINIA_DATA__ ?? {},
 	});
 	const reactiveFetchData = reactive({
-		value: window.__INITIAL_DATA__ ?? {},
+		value: window.__INITIAL_PINIA_DATA__ ?? {},
 	});
-	const fetchData = window.__INITIAL_DATA__ ?? {}; // will be remove at next major version
+	const fetchData = window.__INITIAL_PINIA_DATA__ ?? {}; // will be remove at next major version
 
 	const app = create({
 		render() {
@@ -75,7 +75,7 @@ const clientRender = async () => {
 	// app.use(store)
 	app.use(router);
 	app.use(pinia);
-	setApp(app);
+	// setApp(app);
 	router.beforeResolve(async (to, from, next) => {
 		if (hasRender || !window.__USE_SSR__) {
 			// 找到要进入的组件并提前执行 fetch 函数
@@ -100,14 +100,21 @@ const clientRender = async () => {
 		hasRender = true;
 		next();
 	});
-	await router.isReady();
+	return {
+		app,
+		pinia,
+		router,
+		mount: async () => {
+			await router.isReady();
+			app.mount(window.ssrDevInfo.rootId ?? "#app", !!window.__USE_SSR__);
+		}, // judge ssr/csr
+	};
 
-	app.mount(window.ssrDevInfo.rootId ?? "#app", !!window.__USE_SSR__); // judge ssr/csr
 	// if (!window.__USE_VITE__) {
 	// 	(module as any)?.hot?.accept?.(); // webpack hmr for vue jsx
 	// }
 };
 
-clientRender();
+// clientRender();
 
-export { clientRender };
+export default clientRender;

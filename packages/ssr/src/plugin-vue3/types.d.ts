@@ -5,7 +5,7 @@ export interface vue3AppParams {
 	combineAysncData: any;
 	layoutFetchData: any;
 	asyncData: any;
-	manifest: Record<string, string | undefined>;
+	manifest: Record<string, string[]>;
 	isCsr: boolean;
 	jsInject: VNode<RendererNode, RendererElement, Record<string, any>>[];
 	cssInject: VNode<RendererNode, RendererElement, Record<string, any>>[];

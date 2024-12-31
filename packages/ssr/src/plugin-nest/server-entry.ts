@@ -4,7 +4,12 @@ import type { ISSRContext } from "./types";
 import type { IConfig } from "../utils/types";
 import { createPinia } from "pinia";
 import { serialize } from "ssr-serialize-javascript";
-import { renderToNodeStream, renderToString } from "vue/server-renderer";
+import { PassThrough } from "node:stream";
+import {
+	renderToNodeStream,
+	pipeToNodeWritable,
+	renderToString,
+} from "vue/server-renderer";
 import { Routes } from "../router/combine-routes";
 import { createRouter } from "../router/create";
 import { IFeRouteItem } from "../router/types";
@@ -169,37 +174,31 @@ const serverRender = async (
 	const fn = async () => {
 		const { fetch, chunkName } = routeItem;
 		const dynamicCssOrder = await getAsyncCssChunk(ctx, chunkName, config);
-		// 获取依赖的css文件名列表
-		console.log(
-			"%c Line:166 🥒 finallyCssOrder",
-			"color:#fff;background:#33a5ff",
-			dynamicCssOrder,
-		);
-		console.log(
-			"%c Line:171 🥪 ctx.modules",
-			"color:#fff;background:#ffdd4d",
-			ctx.modules,
-		);
+		// 获取需要加载的css文件列表
+		// console.log(
+		// 	"%c Line:166 🥒 finallyCssList",
+		// 	"color:#fff;background:#33a5ff",
+		// 	dynamicCssOrder,
+		// );
+		// console.log(
+		// 	"%c Line:171 🥪 ctx.modules",
+		// 	"color:#fff;background:#ffdd4d",
+		// 	ctx.modules,
+		// );
 		const dynamicJsOrder = await getAsyncJsChunk(ctx, chunkName, config);
-		// 获取依赖的js文件名列表
+		// console.log(
+		// 	"%c Line:184 🍖 finallyJsList",
+		// 	"color:#fff;background:#6ec1c2",
+		// 	dynamicJsOrder,
+		// );
+		// 获取需要加载的js文件列表
 		const manifest = await getManifest(config);
 		// 获取文件名对应文件路径的对象
 		const [inlineCssOrder, extraCssOrder] = await getInlineCss({
 			dynamicCssOrder,
-			manifest,
 			config,
 		});
 		// 拆解出内联css和外联css
-		console.log(
-			"%c Line:182 🍊 inlineCssOrder",
-			"color:#fff;background:#42b983",
-			inlineCssOrder,
-		);
-		console.log(
-			"%c Line:182 🍕 extraCssOrder",
-			"color:#fff;background:#3f7cff",
-			extraCssOrder,
-		);
 		const isCsr = !!(mode === "csr" || ctx.request.query?.csr);
 
 		const cssInject = (
@@ -209,52 +208,53 @@ const serverRender = async (
 							type: "module",
 							src: "/@vite/client",
 						}),
+						// 开发环境注入vite虚拟文件
 					]
-				: extraCssOrder
-						.map((css) => manifest[css])
-						.filter(Boolean)
-						.map((css) =>
+				: extraCssOrder.filter(Boolean).map(
+						(css) =>
 							h("link", {
 								rel: "stylesheet",
 								href: css,
 							}),
-						)
+						// 生产环境注入外联css文件
+					)
 		).concat(
 			isDev
 				? []
-				: dynamicJsOrder
-						.map((js) => manifest[js])
-						.filter(Boolean)
-						.map((js) =>
+				: dynamicJsOrder.filter(Boolean).map(
+						(js) =>
 							h("link", {
 								href: js,
 								as: "script",
 								rel: "modulepreload",
 							}),
-						),
+						// js文件进行预加载和预解析
+					),
 		);
-		console.log(
-			"%c Line:197 🌰 cssInject",
-			"color:#fff;background:#b03734",
-			cssInject,
-		);
+		// console.log(
+		// 	"%c Line:197 🌰 cssInject",
+		// 	"color:#fff;background:#b03734",
+		// 	cssInject,
+		// );
 
 		const jsInject = isDev
 			? [
 					h("script", {
 						type: "module",
-						src: "/node_modules/kdssr/dist/plugin-vue3/client-entry.mjs",
+						src: "/web/client-entry.ts",
 					}),
 				]
-			: dynamicJsOrder
-					.map((js) => manifest[js])
-					.filter(Boolean)
-					.map((js) =>
-						h("script", {
-							src: js,
-							type: "module",
-						}),
-					);
+			: dynamicJsOrder.filter(Boolean).map((js) =>
+					h("script", {
+						src: js,
+						type: "module",
+					}),
+				);
+		// console.log(
+		// 	"%c Line:236 🥐 jsInject",
+		// 	"color:#fff;background:#465975",
+		// 	jsInject,
+		// );
 		let [layoutFetchData, fetchData] = [{}, {}];
 		if (!isCsr && !bigpipe) {
 			// not fetch when generate <head>
@@ -312,7 +312,12 @@ const serverRender = async (
 			},
 			async () => {
 				if (stream) {
-					return renderToNodeStream(app, ctx);
+					const stream = new PassThrough();
+					// 写入 DOCTYPE
+					stream.write("<!DOCTYPE html>\n");
+					// 使用 pipeToNodeWritable
+					pipeToNodeWritable(app, ctx, stream);
+					return stream;
 				} else {
 					const teleportsContext: {
 						teleports?: Record<string, string>;

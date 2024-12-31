@@ -68,4 +68,4 @@ export const usePinia = () => localStorage.getStore()?.pinia;
 
 export const useApp = () => appLocalStoreage.getStore()?.app;
 
-// export const useCtx = () => localStorage.getStore()?.context;
+export const useCtx = () => localStorage.getStore()?.ctx;
