@@ -169,9 +169,9 @@ const serverRender = async (
 	const fn = async () => {
 		const { fetch, chunkName } = routeItem;
 		const dynamicCssOrder = await getAsyncCssChunk(ctx, chunkName, config);
-		// 获取依赖的css文件列表
+		// 获取需要加载的css文件列表
 		console.log(
-			"%c Line:166 🥒 finallyCssOrder",
+			"%c Line:166 🥒 finallyCssList",
 			"color:#fff;background:#33a5ff",
 			dynamicCssOrder,
 		);
@@ -181,25 +181,19 @@ const serverRender = async (
 			ctx.modules,
 		);
 		const dynamicJsOrder = await getAsyncJsChunk(ctx, chunkName, config);
-		// 获取依赖的js文件列表
+		console.log(
+			"%c Line:184 🍖 finallyJsList",
+			"color:#fff;background:#6ec1c2",
+			dynamicJsOrder,
+		);
+		// 获取需要加载的js文件列表
 		const manifest = await getManifest(config);
 		// 获取文件名对应文件路径的对象
 		const [inlineCssOrder, extraCssOrder] = await getInlineCss({
 			dynamicCssOrder,
-			manifest,
 			config,
 		});
 		// 拆解出内联css和外联css
-		console.log(
-			"%c Line:182 🍊 inlineCssOrder",
-			"color:#fff;background:#42b983",
-			inlineCssOrder,
-		);
-		console.log(
-			"%c Line:182 🍕 extraCssOrder",
-			"color:#fff;background:#3f7cff",
-			extraCssOrder,
-		);
 		const isCsr = !!(mode === "csr" || ctx.request.query?.csr);
 
 		const cssInject = (
@@ -209,22 +203,27 @@ const serverRender = async (
 							type: "module",
 							src: "/@vite/client",
 						}),
+						// 开发环境注入vite虚拟文件
 					]
-				: extraCssOrder.filter(Boolean).map((css) =>
-						h("link", {
-							rel: "stylesheet",
-							href: css,
-						}),
+				: extraCssOrder.filter(Boolean).map(
+						(css) =>
+							h("link", {
+								rel: "stylesheet",
+								href: css,
+							}),
+						// 生产环境注入外联css文件
 					)
 		).concat(
 			isDev
 				? []
-				: dynamicJsOrder.filter(Boolean).map((js) =>
-						h("link", {
-							href: js,
-							as: "script",
-							rel: "modulepreload",
-						}),
+				: dynamicJsOrder.filter(Boolean).map(
+						(js) =>
+							h("link", {
+								href: js,
+								as: "script",
+								rel: "modulepreload",
+							}),
+						// js文件进行预加载和预解析
 					),
 		);
 		console.log(
@@ -246,6 +245,11 @@ const serverRender = async (
 						type: "module",
 					}),
 				);
+		console.log(
+			"%c Line:236 🥐 jsInject",
+			"color:#fff;background:#465975",
+			jsInject,
+		);
 		let [layoutFetchData, fetchData] = [{}, {}];
 		if (!isCsr && !bigpipe) {
 			// not fetch when generate <head>

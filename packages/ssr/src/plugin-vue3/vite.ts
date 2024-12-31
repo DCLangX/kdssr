@@ -119,6 +119,7 @@ const viteBuild = async () => {
 		mode: process.env.VITEMODE ?? "production",
 		build: {
 			ssrManifest: true,
+			modulePreload: { polyfill: false, resolveDependencies: () => [] },
 			outDir: "build/client",
 			rollupOptions: {
 				output: rollupOutputOptions(),
@@ -135,6 +136,7 @@ const viteBuild = async () => {
 		mode: process.env.VITEMODE ?? "production",
 		build: {
 			ssr: true,
+			modulePreload: { polyfill: false, resolveDependencies: () => [] },
 			outDir: "build/server",
 			rollupOptions: {
 				input: "kdssr/server-entry", // setting prebundle list by client-entry in dev

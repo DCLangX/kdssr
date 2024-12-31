@@ -56,11 +56,11 @@ async function render(ctx: ISSRContext, options?: UserConfig) {
 			? (require(options.dynamicFile.configFile) as any).userConfig
 			: {}),
 	};
-	console.log(
-		"%c Line:54 🍏 mergeConfig",
-		"color:#fff;background:#3f7cff",
-		mergeConfig,
-	);
+	// console.log(
+	// 	"%c Line:54 🍏 mergeConfig",
+	// 	"color:#fff;background:#3f7cff",
+	// 	mergeConfig,
+	// );
 
 	const config: IConfig = Object.assign({}, mergeConfig, options);
 	// support combine dynamic customeHeadScript when call render

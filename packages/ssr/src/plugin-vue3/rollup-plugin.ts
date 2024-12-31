@@ -529,7 +529,9 @@ function routeAssetsPlugin(options = {}) {
 			// 生成最终的 manifest，保持依赖顺序
 			const manifest = {};
 			for (const [routeName, routeInfo] of routeAssets) {
-				manifest[routeName] = Array.from(routeInfo.assets);
+				manifest[routeName] = Array.from(routeInfo.assets).map(
+					(item) => "/" + item,
+				);
 				console.log(
 					`\nRoute "${routeName}" dependencies:`,
 					manifest[routeName],

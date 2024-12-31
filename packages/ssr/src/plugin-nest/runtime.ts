@@ -59,7 +59,7 @@ const readAsyncChunk = async (
 	}
 };
 /**
- * @description: 根据chunkName获取打包时对应的css或js资源文件
+ * @description: 根据路由条目的chunkName，获取资源映射文件中记载的该路由所需的css或js资源文件
  * @param {string} chunkName
  * @param {IConfig} config
  * @param {*} type
@@ -72,6 +72,7 @@ const addAsyncChunk = async (
 ) => {
 	const arr = [];
 	const asyncChunkMap = await getManifest(config);
+	// 取得静态资源文件映射表
 	for (const key in asyncChunkMap) {
 		if (key === chunkName) {
 			arr.push(
@@ -79,20 +80,15 @@ const addAsyncChunk = async (
 			);
 		}
 	}
-	console.log(
-		"%c Line:84 🥚 addAsyncChunk",
-		"color:#fff;background:#33a5ff",
-		arr,
-	);
 	return arr;
 };
 
 /**
- * @description: 处理自定义顺序，如果传入的是函数，则执行函数，否则直接返回数组
+ * @description: 处理需要插入的自定义资源文件，如果传入的是函数，则执行函数，否则直接返回数组
  * @param {UserConfig.extraJsOrder} order
  * @param {ISSRContext} ctx
  * @param {*} string
- * @return {*} 返回要加载的文件名的数组
+ * @return {*} 返回要插入的文件名的数组
  */
 export const nomalrizeOrder = (
 	order: UserConfig["extraJsOrder"],
@@ -124,8 +120,8 @@ export const getDefineEnv = () => {
 /**
  * @description: 获取路由的chunkName所需的css文件
  * @param {ISSRContext} ctx
- * @param {string} chunkName
- * @param {IConfig} config
+ * @param {string} chunkName 路由条目里的chunkName
+ * @param {IConfig} config ssr框架配置
  * @param {*} Promise
  * @return {*}
  */
@@ -139,11 +135,6 @@ export const getAsyncCssChunk = async (
 		...nomalrizeOrder(extraCssOrder, ctx),
 		...(await addAsyncChunk(chunkName, config, "css")),
 	];
-	console.log(
-		"%c Line:135 🌰 combineOrder",
-		"color:#fff;background:#3f7cff",
-		combineOrder,
-	);
 	// 以上获取到了默认的和自定义的所有css列表，接下来进行排序
 	if (cssOrderPriority) {
 		const priority =
@@ -205,16 +196,13 @@ export const getScriptArr = (
 /**
  * @description: 处理需要内联的css，inlineCssContent存放所有内联的css内容，cssInjectOrder存放普通的css文件名
  * @param {array} dynamicCssOrder 需要加载的css文件名列表
- * @param {array} manifest 存放css文件名对应的具体文件路径
  * @return {*}
  */
 export const getInlineCss = async ({
 	dynamicCssOrder,
-	manifest,
 	config,
 }: {
 	dynamicCssOrder: string[];
-	manifest: Record<string, string[]>;
 	config: UserConfig;
 }) => {
 	const { cssInline } = config;
