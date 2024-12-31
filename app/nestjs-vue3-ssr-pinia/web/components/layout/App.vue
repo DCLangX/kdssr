@@ -14,6 +14,7 @@ const props = defineProps<{
 const router = useRouter();
 
 router.options.scrollBehavior = (to, from, savedPosition) => {
+	console.log("%c Line:17 🥚 to", "color:#fff;background:#ea7e5c", to);
 	// always scroll to top
 	return { top: 0 };
 };

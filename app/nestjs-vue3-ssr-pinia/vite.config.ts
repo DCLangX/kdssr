@@ -41,7 +41,7 @@ export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => ({
 	build: {
 		rollupOptions: {
 			// 生产构建时分别构建server-entry和client-entry，server-entry需要在生产构建加--ssr参数时构建，而dev模式下sever-entry是在nest中直接调用，不需要构建
-			input: isSsrBuild ? "kdssr/server-entry" : "kdssr/client-entry",
+			input: isSsrBuild ? "kdssr/server-entry" : "@/client-entry",
 		},
 	},
 }));

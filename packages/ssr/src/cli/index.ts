@@ -63,21 +63,13 @@ const startOrBuild = async (argv: Argv, type: "start" | "build") => {
 	if (!argv.api) {
 		const client = clientPlugin();
 		await client?.[type]?.().catch((err) => {
-			console.log(
-				"%c Line:68 🌽 err",
-				"color:#fff;background:#465975",
-				err,
-			);
+			console.error("客户端渲染错误", err);
 		});
 	}
 	if (!argv.web) {
 		const server = serverPlugin();
 		await server?.[type]?.(argv).catch((err) => {
-			console.log(
-				"%c Line:68 🌽 err",
-				"color:#fff;background:#465975",
-				err,
-			);
+			console.error("服务端渲染错误", err);
 		});
 	}
 	if (type === "build") {
@@ -214,10 +206,10 @@ yargs(hideBin(process.argv))
 	.alias("v", "version")
 	.fail((msg, err) => {
 		if (err) {
-			console.log(err);
+			console.error(err);
 			spinner.stop();
 			process.exit(1);
 		}
-		console.log(msg);
+		console.error(msg);
 	})
 	.parse();

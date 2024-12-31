@@ -1,197 +1,63 @@
-// import path from "path";
-// import fs from "fs";
-// import * as acorn from "acorn";
-
-// // 定义插件
-// const ssrManifestPlugin = (options = {}) => {
-// 	const manifest = {}; // 存储路由依赖的 manifest
-// 	const dynamicImports = new Map(); // 存储动态导入模块路径
-// 	return {
-// 		name: "ssr-manifest", // 插件名称
-
-// 		load(id) {
-// 			if (
-// 				id.endsWith("ssr-declare-routes.js") ||
-// 				id.endsWith("ssr-manual-routes.js")
-// 			) {
-// 				try {
-// 					const code = fs.readFileSync(id, "utf-8");
-// 					const ast = acorn.parse(code, {
-// 						ecmaVersion: 2020,
-// 						sourceType: "module",
-// 					});
-
-// 					function findFeRoutes(node) {
-// 						if (
-// 							node &&
-// 							node.type === "ExportNamedDeclaration" &&
-// 							node.declaration
-// 						) {
-// 							if (
-// 								node.declaration.type === "VariableDeclaration"
-// 							) {
-// 								for (const decl of node.declaration
-// 									.declarations) {
-// 									if (
-// 										decl.id.name === "FeRoutes" &&
-// 										decl.init.type === "ArrayExpression"
-// 									) {
-// 										return decl.init;
-// 									}
-// 								}
-// 							}
-// 						}
-// 						return null;
-// 					}
-
-// 					function extractRouteInfo(routesNode) {
-// 						routesNode.elements.forEach((routeNode) => {
-// 							if (routeNode.type === "ObjectExpression") {
-// 								let routeName;
-// 								let componentImport;
-// 								let fetchImport;
-
-// 								routeNode.properties.forEach((prop) => {
-// 									if (prop.key.value === "name") {
-// 										routeName = prop.value.value;
-// 									} else if (prop.key.value === "component") {
-// 										componentImport = parseDynamicImport(
-// 											prop.value,
-// 										);
-// 									} else if (prop.key.value === "fetch") {
-// 										fetchImport = parseDynamicImport(
-// 											prop.value,
-// 										);
-// 									}
-// 								});
-
-// 								if (routeName) {
-// 									manifest[routeName] = [];
-// 									if (componentImport)
-// 										dynamicImports.set(
-// 											componentImport,
-// 											routeName,
-// 										);
-// 									if (fetchImport)
-// 										dynamicImports.set(
-// 											fetchImport,
-// 											routeName,
-// 										);
-// 								}
-// 							}
-// 						});
-// 					}
-
-// 					function parseDynamicImport(node) {
-// 						if (
-// 							node.type === "ArrowFunctionExpression" &&
-// 							node.body.type === "ImportExpression"
-// 						) {
-// 							const importExpr = node.body.source;
-// 							if (importExpr.type === "Literal") {
-// 								return importExpr.value;
-// 							}
-// 						}
-// 						return null;
-// 					}
-
-// 					const routesNode = findFeRoutes(
-// 						ast.body.find((bodyNode) => {
-// 							return bodyNode;
-// 						}),
-// 					);
-// 					if (routesNode) {
-// 						extractRouteInfo(routesNode);
-// 					}
-// 				} catch (err) {
-// 					this.error(`Failed to parse ${id}: ${err.message}`);
-// 				}
-// 			}
-// 		},
-// 		moduleParsed(this, info) {
-// 			console.log(
-// 				"%c Line:112 🌭 info",
-// 				"color:#fff;background:#93c0a4",
-// 				Object.assign({}, info),
-// 			);
-// 		},
-// 		generateBundle(options, bundle) {
-// 			// console.log(
-// 			// 	"%c Line:112 🌽 bundle",
-// 			// 	"color:#fff;background:#b03734",
-// 			// );
-
-// 			// console.dir(bundle);
-// 			// 收集所有的 chunk 文件路径
-// 			const chunkFiles = new Map();
-// 			for (const fileName in bundle) {
-// 				if (bundle[fileName].type === "chunk") {
-// 					chunkFiles.set(fileName, bundle[fileName].fileName);
-// 				}
-// 			}
-
-// 			// 为每个路由的依赖查找对应的文件
-// 			for (const routeName in manifest) {
-// 				const dependencies = manifest[routeName];
-// 				const resolvedDependencies = dependencies
-// 					.map((dep) => {
-// 						for (const [chunkName, fileName] of chunkFiles) {
-// 							if (fileName.includes(dep)) {
-// 								return fileName;
-// 							}
-// 						}
-// 						return null;
-// 					})
-// 					.filter(Boolean);
-
-// 				manifest[routeName] = resolvedDependencies;
-// 			}
-// 		},
-// 	};
-// };
-
 // export default ssrManifestPlugin;
-import fs from "fs";
-import path from "path";
-import MagicString from "magic-string";
 import { parse } from "@babel/parser";
 import traverseDefault from "@babel/traverse";
+import type {
+	OutputChunk,
+	OutputBundle,
+	OutputOptions,
+	OutputAsset,
+} from "rollup";
 
 const traverse = traverseDefault.default;
+interface ViteMetadata {
+	importedCss: Set<string>;
+	importedAssets: Set<string>;
+	importedModules: Set<string>;
+}
+
+interface CustomOutputChunk extends OutputChunk {
+	viteMetadata: ViteMetadata;
+	imports: string[];
+	isDynamicEntry: boolean;
+	modules: Record<string, any>;
+}
 function routeAssetsPlugin(options = {}) {
 	const {
 		routeFile = "ssr-declare-routes.js",
 		manifestFile = "assets-manifest.json",
-		entryFile = "client-entry.mjs", // 添加入口文件配置
+		entryFile = "client-entry.ts", // 添加入口文件配置
 	} = options;
 
 	const routeAssets = new Map();
-	let bundle;
+	let bundle: OutputBundle | undefined;
 	let entryDeps = new Set(); // 存储入口文件的依赖
 
-	// 改进依赖收集函数
+	// 收集chunks的依赖，会递归收集依赖的依赖，第一次传入的是路由的component或fetch组件的chunk
 	function collectDependencies(
-		chunk,
-		seenChunks = new Set(),
-		seenModules = new Set(),
-	) {
+		chunk: OutputAsset | OutputChunk,
+		seenChunks: Set<string> = new Set(),
+		seenModules: Set<string> = new Set(),
+	): Set<string> {
 		if (!chunk || seenChunks.has(chunk.fileName)) return new Set();
 		seenChunks.add(chunk.fileName);
 
 		const assets = new Set([chunk.fileName]);
 
-		// 收集 CSS
+		// 收集组件CSS
 		if (chunk.viteMetadata?.importedCss) {
 			chunk.viteMetadata.importedCss.forEach((css) => assets.add(css));
 		}
 
-		// 收集动态导入
+		// 收集组件静态导入的依赖
 		if (chunk.imports) {
 			chunk.imports.forEach((importFile) => {
+				// 遍历后找到这个依赖的条目
 				const importedChunk = Object.values(bundle).find(
 					(c) => c.fileName === importFile,
 				);
+
 				if (importedChunk) {
+					// 递归查找，将这个依赖的依赖收集进来
 					const deps = collectDependencies(
 						importedChunk,
 						seenChunks,
@@ -202,13 +68,13 @@ function routeAssetsPlugin(options = {}) {
 			});
 		}
 
-		// 收集静态导入
+		// 查找组件里打包进来的模块
 		if (chunk.modules) {
 			Object.keys(chunk.modules).forEach((moduleId) => {
 				if (seenModules.has(moduleId)) return;
 				seenModules.add(moduleId);
 
-				// 查找所有引用这个模块的 chunks
+				// 查找所有同样打包进这个模块的 chunk
 				Object.values(bundle).forEach((otherChunk) => {
 					if (otherChunk.type === "chunk" && otherChunk.modules) {
 						const hasModule = moduleId in otherChunk.modules;
@@ -219,6 +85,7 @@ function routeAssetsPlugin(options = {}) {
 							(hasModule && (isDynamicImport || isEntry)) ||
 							otherChunk.imports?.includes(moduleId)
 						) {
+							// 如果这个同样打包进这个模块的 chunk，是属于动态导入的或者就是入口文件，那么就再递归收集一下这个chunk的依赖
 							const deps = collectDependencies(
 								otherChunk,
 								seenChunks,
@@ -232,24 +99,24 @@ function routeAssetsPlugin(options = {}) {
 		}
 
 		// 收集共享的依赖模块
-		if (chunk.viteMetadata?.importedModules) {
-			chunk.viteMetadata.importedModules.forEach((mod) => {
-				Object.values(bundle).forEach((otherChunk) => {
-					if (
-						otherChunk.type === "chunk" &&
-						otherChunk.modules &&
-						Object.keys(otherChunk.modules).includes(mod)
-					) {
-						const deps = collectDependencies(
-							otherChunk,
-							seenChunks,
-							seenModules,
-						);
-						deps.forEach((dep) => assets.add(dep));
-					}
-				});
-			});
-		}
+		// if (chunk.viteMetadata?.importedModules) {
+		// 	chunk.viteMetadata.importedModules.forEach((mod) => {
+		// 		Object.values(bundle).forEach((otherChunk) => {
+		// 			if (
+		// 				otherChunk.type === "chunk" &&
+		// 				otherChunk.modules &&
+		// 				Object.keys(otherChunk.modules).includes(mod)
+		// 			) {
+		// 				const deps = collectDependencies(
+		// 					otherChunk,
+		// 					seenChunks,
+		// 					seenModules,
+		// 				);
+		// 				deps.forEach((dep) => assets.add(dep));
+		// 			}
+		// 		});
+		// 	});
+		// }
 
 		return assets;
 	}
@@ -438,10 +305,9 @@ function routeAssetsPlugin(options = {}) {
 			return null;
 		},
 
-		async generateBundle(options, bundleInfo) {
+		async generateBundle(options: OutputOptions, bundleInfo: OutputBundle) {
 			bundle = bundleInfo;
 			console.log("Processing chunks:", Object.keys(bundle).length);
-
 			// 首先收集入口文件的依赖
 			const entryChunk = Object.values(bundle).find(
 				(chunk) =>

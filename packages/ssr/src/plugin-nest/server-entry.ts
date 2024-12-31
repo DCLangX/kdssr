@@ -4,7 +4,12 @@ import type { ISSRContext } from "./types";
 import type { IConfig } from "../utils/types";
 import { createPinia } from "pinia";
 import { serialize } from "ssr-serialize-javascript";
-import { renderToNodeStream, renderToString } from "vue/server-renderer";
+import { PassThrough } from "node:stream";
+import {
+	renderToNodeStream,
+	pipeToNodeWritable,
+	renderToString,
+} from "vue/server-renderer";
 import { Routes } from "../router/combine-routes";
 import { createRouter } from "../router/create";
 import { IFeRouteItem } from "../router/types";
@@ -170,22 +175,22 @@ const serverRender = async (
 		const { fetch, chunkName } = routeItem;
 		const dynamicCssOrder = await getAsyncCssChunk(ctx, chunkName, config);
 		// 获取需要加载的css文件列表
-		console.log(
-			"%c Line:166 🥒 finallyCssList",
-			"color:#fff;background:#33a5ff",
-			dynamicCssOrder,
-		);
-		console.log(
-			"%c Line:171 🥪 ctx.modules",
-			"color:#fff;background:#ffdd4d",
-			ctx.modules,
-		);
+		// console.log(
+		// 	"%c Line:166 🥒 finallyCssList",
+		// 	"color:#fff;background:#33a5ff",
+		// 	dynamicCssOrder,
+		// );
+		// console.log(
+		// 	"%c Line:171 🥪 ctx.modules",
+		// 	"color:#fff;background:#ffdd4d",
+		// 	ctx.modules,
+		// );
 		const dynamicJsOrder = await getAsyncJsChunk(ctx, chunkName, config);
-		console.log(
-			"%c Line:184 🍖 finallyJsList",
-			"color:#fff;background:#6ec1c2",
-			dynamicJsOrder,
-		);
+		// console.log(
+		// 	"%c Line:184 🍖 finallyJsList",
+		// 	"color:#fff;background:#6ec1c2",
+		// 	dynamicJsOrder,
+		// );
 		// 获取需要加载的js文件列表
 		const manifest = await getManifest(config);
 		// 获取文件名对应文件路径的对象
@@ -226,17 +231,17 @@ const serverRender = async (
 						// js文件进行预加载和预解析
 					),
 		);
-		console.log(
-			"%c Line:197 🌰 cssInject",
-			"color:#fff;background:#b03734",
-			cssInject,
-		);
+		// console.log(
+		// 	"%c Line:197 🌰 cssInject",
+		// 	"color:#fff;background:#b03734",
+		// 	cssInject,
+		// );
 
 		const jsInject = isDev
 			? [
 					h("script", {
 						type: "module",
-						src: "/node_modules/kdssr/dist/plugin-vue3/client-entry.mjs",
+						src: "/web/client-entry.ts",
 					}),
 				]
 			: dynamicJsOrder.filter(Boolean).map((js) =>
@@ -245,11 +250,11 @@ const serverRender = async (
 						type: "module",
 					}),
 				);
-		console.log(
-			"%c Line:236 🥐 jsInject",
-			"color:#fff;background:#465975",
-			jsInject,
-		);
+		// console.log(
+		// 	"%c Line:236 🥐 jsInject",
+		// 	"color:#fff;background:#465975",
+		// 	jsInject,
+		// );
 		let [layoutFetchData, fetchData] = [{}, {}];
 		if (!isCsr && !bigpipe) {
 			// not fetch when generate <head>
@@ -307,7 +312,12 @@ const serverRender = async (
 			},
 			async () => {
 				if (stream) {
-					return renderToNodeStream(app, ctx);
+					const stream = new PassThrough();
+					// 写入 DOCTYPE
+					stream.write("<!DOCTYPE html>\n");
+					// 使用 pipeToNodeWritable
+					pipeToNodeWritable(app, ctx, stream);
+					return stream;
 				} else {
 					const teleportsContext: {
 						teleports?: Record<string, string>;
