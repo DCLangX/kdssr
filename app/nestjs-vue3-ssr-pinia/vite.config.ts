@@ -23,7 +23,8 @@ export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => ({
 	ssr: {
 		external: ["shelljs"],
 		// shelljs经由rollup打包后有问题，会报错，故排除该项，并且需要在生产部署的依赖上增加shelljs
-		noExternal: [/\.(css|less|sass|scss)$/, "swiper", /swiper/],
+		noExternal: isSsrBuild ? true : [],
+		// 生产构建server-entry构建时禁用所有依赖的外部化，也就是所有依赖打包到server-entry中，这样在生产运行时不需要额外的依赖，但是开发模式下不要这样做，会导致vite在esm环境下执行ssrLoadModule函数动态加载server-entry后会因为运行不了某些cjs依赖而报错
 	},
 	plugins: [vue(), Unocss()],
 	resolve: {

@@ -8,23 +8,21 @@
     "@nestjs/core": "^10.4.15",
     "@nestjs/platform-express": "^10.4.15",
     "@vitejs/plugin-vue": "^5.1.4",
-    "@vue/server-renderer": "^3.5.12",
     "kdssr": "workspace:^",
     "pinia": "^2.2.5",
     "pm2": "^5.4.2",
     "reflect-metadata": "^0.2.2",
     "shelljs": "^0.8.5",
     "swiper": "11.1.14",
-    "vite": "^5.4.10",
+    "vite": "^6.0.7",
     "vue": "^3.5.12",
-    "vue-router": "^4.4.5",
-    "vuex": "^4.1.0"
+    "vue-router": "^4.4.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.10.0",
     "@nestjs/cli": "^10.4.5",
-    "@swc/cli": "0.5.0",
-    "@swc/core": "^1.7.40",
+    "@swc/cli": "^0.5.2",
+    "@swc/core": "^1.10.4",
     "@types/express": "^5.0.0",
     "@types/node": "^22.8.4",
     "@typescript-eslint/eslint-plugin": "^8.12.2",
@@ -56,6 +54,6 @@
     "build:vite": "ssr build --vite",
     "lint": "eslint . --ext .js,.tsx,.ts,.vue --cache",
     "lint:fix": "eslint . --ext .js,.tsx,.ts,.vue --cache --fix",
-    "debug": "tsx ../../packages/ssr/src/cli/index.ts build"
+    "debug": "tsx ../../packages/ssr/src/cli/index.ts start"
   }
 }

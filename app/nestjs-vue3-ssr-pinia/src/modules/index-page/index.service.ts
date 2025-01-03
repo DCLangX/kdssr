@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { IndexData } from "~/typings/data";
-import mock from "./index.mock.js";
+import mock from "./index.mock";
 
 @Injectable()
 export class ApiService {

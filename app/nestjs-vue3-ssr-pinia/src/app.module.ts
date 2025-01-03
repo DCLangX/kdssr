@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import { DetailModule } from "./modules/detail-page/detail.module.js";
-import { indexModule } from "./modules/index-page/index.module.js";
+import { DetailModule } from "./modules/detail-page/detail.module";
+import { indexModule } from "./modules/index-page/index.module";
 
 @Module({
 	imports: [DetailModule, indexModule],
