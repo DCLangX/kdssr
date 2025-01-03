@@ -1,0 +1,11 @@
+{
+	"$schema": "https://swc.rs/schema.json",
+	"jsc": {
+		"target": "esnext"
+	},
+	"module": {
+		"type": "es6",
+    "resolveFully": true
+	},
+	"minify": false
+}

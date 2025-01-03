@@ -3,7 +3,7 @@ import type { Request, Response } from "express";
 import type { Readable } from "stream";
 import { render } from "kdssr";
 
-import { ApiDetailService } from "./detail.service.js";
+import { ApiDetailService } from "./detail.service";
 
 @Controller("/")
 export class DetailController {

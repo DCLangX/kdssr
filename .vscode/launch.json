@@ -4,24 +4,23 @@
     {
       "name": "Launch nestjs-vue3-ssr-pinia via PNPM",
       "request": "launch",
+      "env": {
+        "NODE_OPTIONS": "--preserve-symlinks --preserve-symlinks-main"
+      },
       "runtimeArgs": ["run-script", "start"],
       "cwd": "${workspaceFolder}\\app\\nestjs-vue3-ssr-pinia",
       "console": "integratedTerminal",
       "runtimeExecutable": "pnpm",
       "outputCapture": "std",
       "skipFiles": [
-        "<node_internals>/**",
-        "${workspaceFolder}/node_modules/**/vite/**",
+        "<node_internals>/**"
         // "${workspaceFolder}/node_modules/**/vite*/**/chunks/**",
-        "${workspaceFolder}/node_modules/**/glob*/**",
-        "${workspaceFolder}/node_modules/**/yargs*/**",
-        "${workspaceFolder}/node_modules/**/shelljs*/**"
+        // "${workspaceFolder}/node_modules/**/glob*/**",
+        // "${workspaceFolder}/node_modules/**/yargs*/**",
+        // "${workspaceFolder}/node_modules/**/shelljs*/**"
       ],
       "type": "node",
-      "resolveSourceMapLocations": [
-        "${workspaceFolder}/**"
-        // "!**/node_modules/**"
-      ]
+      "resolveSourceMapLocations": ["${workspaceFolder}/**", "**/node_modules/**"]
     },
     {
       "name": "Build nestjs-vue3-ssr-pinia via PNPM",
@@ -74,9 +73,15 @@
       "request": "launch",
       "name": "启动程序",
       "skipFiles": ["<node_internals>/**"],
+      "cwd": "${workspaceFolder}\\app\\nestjs-vue3-ssr-pinia",
       "program": "${workspaceFolder}\\packages\\ssr\\dist\\cli\\index.mjs",
       "console": "integratedTerminal",
-      "args": ["start"]
+      // "runtimeArgs": ["--preserve-symlinks"],
+      "args": ["start"],
+      "resolveSourceMapLocations": [
+        "${workspaceFolder}/**"
+        // "!**/node_modules/**"
+      ]
     }
   ]
 }
