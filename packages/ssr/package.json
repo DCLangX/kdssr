@@ -14,7 +14,10 @@
 		".": {
 			"import": "./dist/index.mjs"
 		},
-		"./client-entry": "./dist/plugin-vue3/client-entry.mjs",
+		"./client-entry": {
+      "types": "./dist/plugin-vue3/client-entry.d.ts",
+      "import": "./dist/plugin-vue3/client-entry.mjs"
+    },
 		"./server-entry": "./dist/plugin-nest/server-entry.mjs",
 		"./dist/*": "./dist/*"
 	},
