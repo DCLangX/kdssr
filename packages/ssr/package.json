@@ -1,6 +1,6 @@
 {
 	"name": "kdssr",
-	"version": "2.0.0",
+	"version": "1.0.0",
 	"description": "",
 	"type": "module",
 	"types": "./dist/index.d.mts",
@@ -26,7 +26,6 @@
 		"dev": "tsx watch ./src/index.ts",
 		"build": "unbuild",
 		"build:tsc": "tsc&&tsc -p ./tsconfig.cjs.json",
-		"build:pkgroll": "pkgroll --clean-dist&&pkgroll --sourcemap",
 		"lint": "eslint",
 		"lint-fix": "eslint --fix src/**/*.ts",
 		"format": "prettier --write .",
@@ -67,7 +66,6 @@
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-prettier": "^5.2.1",
 		"pinia": "^2.2.2",
-		"pkgroll": "^2.5.0",
 		"prettier": "^3.3.3",
 		"typescript": "^5.6.2",
 		"typescript-eslint": "^8.6.0",

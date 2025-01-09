@@ -5,6 +5,7 @@ import type {
 	OutputChunk,
 	OutputBundle,
 	OutputOptions,
+	NormalizedOutputOptions,
 	OutputAsset,
 } from "rollup";
 
@@ -194,7 +195,13 @@ function routeAssetsPlugin(options = {}) {
 		},
 
 		async transform(code, id) {
-			if (!id.endsWith(routeFile)) return null;
+			if (
+				!(
+					id.endsWith("ssr-declare-routes.js") ||
+					id.endsWith("ssr-manual-routes.js")
+				)
+			)
+				return null;
 
 			console.log("Processing route file:", id);
 
@@ -305,7 +312,10 @@ function routeAssetsPlugin(options = {}) {
 			return null;
 		},
 
-		async generateBundle(options: OutputOptions, bundleInfo: OutputBundle) {
+		async generateBundle(
+			options: NormalizedOutputOptions,
+			bundleInfo: OutputBundle,
+		) {
 			bundle = bundleInfo;
 			console.log("Processing chunks:", Object.keys(bundle).length);
 			// 首先收集入口文件的依赖

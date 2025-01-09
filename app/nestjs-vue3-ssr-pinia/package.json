@@ -54,6 +54,6 @@
     "build:vite": "ssr build --vite",
     "lint": "eslint . --ext .js,.tsx,.ts,.vue --cache",
     "lint:fix": "eslint . --ext .js,.tsx,.ts,.vue --cache --fix",
-    "debug": "tsx ../../packages/ssr/src/cli/index.ts start"
+    "debug": "tsx ../../packages/ssr/src/cli/index.ts build --viteMode test"
   }
 }
