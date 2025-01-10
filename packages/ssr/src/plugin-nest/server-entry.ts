@@ -56,7 +56,7 @@ const serverRender = async (
 		bigpipe,
 		hashRouter,
 	} = config;
-	const router = createRouter();
+	const router = createRouter({ base: prefix });
 	const pinia = createPinia();
 	const rawPath = ctx.request.path ?? ctx.request.url;
 	// 尽量取到不含问号参数的url，比如这样/detail/cbba934b14f747049187
