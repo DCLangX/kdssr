@@ -292,27 +292,15 @@ importers:
       '@babel/traverse':
         specifier: ^7.26.4
         version: 7.26.4
-      '@types/es-module-lexer':
-        specifier: ^0.4.3
-        version: 0.4.3
-      '@types/shelljs':
-        specifier: ^0.8.15
-        version: 0.8.15
       cheerio:
         specifier: ^1.0.0
         version: 1.0.0
-      dotenv:
-        specifier: ^16.4.5
-        version: 16.4.7
       es-module-lexer:
         specifier: ^1.5.4
         version: 1.6.0
       esbuild:
         specifier: ^0.23.1
         version: 0.23.1
-      helmet:
-        specifier: ^7.1.0
-        version: 7.2.0
       http-proxy-middleware:
         specifier: ^3.0.2
         version: 3.0.3
@@ -328,30 +316,18 @@ importers:
       qs:
         specifier: ^6.13.0
         version: 6.13.1
-      rollup:
-        specifier: ^4.24.2
-        version: 4.29.1
       shelljs:
         specifier: ^0.8.5
         version: 0.8.5
-      ssr-serialize-javascript:
-        specifier: ^6.0.4
-        version: 6.0.4
       vite:
         specifier: ^5.4.4
         version: 5.4.11(@types/node@22.10.2)(less@4.2.1)(terser@5.37.0)
-      vitest:
-        specifier: ^2.1.1
-        version: 2.1.8(@types/node@22.10.2)(less@4.2.1)(terser@5.37.0)
       vue:
         specifier: ^3.5.4
         version: 3.5.13(typescript@5.7.2)
       vue-router:
         specifier: ^4.4.4
         version: 4.5.0(vue@3.5.13(typescript@5.7.2))
-      winston:
-        specifier: ^3.14.2
-        version: 3.17.0
       yargs:
         specifier: ^17.7.2
         version: 17.7.2
@@ -359,15 +335,24 @@ importers:
       '@eslint/js':
         specifier: ^9.10.0
         version: 9.17.0
+      '@types/es-module-lexer':
+        specifier: ^0.4.3
+        version: 0.4.3
       '@types/eslint__js':
         specifier: ^8.42.3
         version: 8.42.3
       '@types/node':
         specifier: ^22.5.5
         version: 22.10.2
+      '@types/shelljs':
+        specifier: ^0.8.15
+        version: 0.8.15
       acorn:
         specifier: ^8.14.0
         version: 8.14.0
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.4.7
       eslint:
         specifier: ^9.10.0
         version: 9.17.0(jiti@2.4.2)
@@ -377,15 +362,21 @@ importers:
       eslint-plugin-prettier:
         specifier: ^5.2.1
         version: 5.2.1(@types/eslint@9.6.1)(eslint-config-prettier@9.1.0(eslint@9.17.0(jiti@2.4.2)))(eslint@9.17.0(jiti@2.4.2))(prettier@3.4.2)
+      helmet:
+        specifier: ^7.1.0
+        version: 7.2.0
       pinia:
         specifier: ^2.2.2
         version: 2.3.0(typescript@5.7.2)(vue@3.5.13(typescript@5.7.2))
-      pkgroll:
-        specifier: ^2.5.0
-        version: 2.6.0(typescript@5.7.2)
       prettier:
         specifier: ^3.3.3
         version: 3.4.2
+      rollup:
+        specifier: ^4.24.2
+        version: 4.29.1
+      ssr-serialize-javascript:
+        specifier: ^6.0.4
+        version: 6.0.4
       typescript:
         specifier: ^5.6.2
         version: 5.7.2
@@ -395,6 +386,12 @@ importers:
       unbuild:
         specifier: ^3.0.1
         version: 3.0.1(typescript@5.7.2)(vue@3.5.13(typescript@5.7.2))
+      vitest:
+        specifier: ^2.1.1
+        version: 2.1.8(@types/node@22.10.2)(less@4.2.1)(terser@5.37.0)
+      winston:
+        specifier: ^3.14.2
+        version: 3.17.0
 
 packages:
 
@@ -1501,24 +1498,6 @@ packages:
       rollup:
         optional: true
 
-  '@rollup/plugin-dynamic-import-vars@2.1.5':
-    resolution: {integrity: sha512-Mymi24fd9hlRifdZV/jYIFj1dn99F34imiYu3KzlAcgBcRi3i9SucgW/VRo5SQ9K4NuQ7dCep6pFWgNyhRdFHQ==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-
-  '@rollup/plugin-inject@5.0.5':
-    resolution: {integrity: sha512-2+DEJbNBoPROPkgTDNe8/1YXWcqxbN5DTjASVIOx8HS+pITXushyNiBV56RB08zuptzz8gT3YfkqriTBVycepg==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-
   '@rollup/plugin-json@6.1.0':
     resolution: {integrity: sha512-EGI2te5ENk1coGeADSIwZ7G2Q8CJS2sF120T7jLw4xFw9n7wIOXHo+kIYRAoVpJAN+kmqZSoO3Fp4JtoNF4ReA==}
     engines: {node: '>=14.0.0'}
@@ -1530,15 +1509,6 @@ packages:
 
   '@rollup/plugin-node-resolve@15.3.0':
     resolution: {integrity: sha512-9eO5McEICxMzJpDW9OnMYSv4Sta3hmt7VtBFz5zR9273suNOydOyq/FrGeGy+KsTRFm8w0SLVhzig2ILFT63Ag==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^2.78.0||^3.0.0||^4.0.0
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-
-  '@rollup/plugin-node-resolve@16.0.0':
-    resolution: {integrity: sha512-0FPvAeVUT/zdWoO0jnb/V5BlBsUSNfkIOtFHzMO4H9MOklrmQFY6FduVHKucNb/aTFxvnGhj4MNj/T1oNdDfNg==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^2.78.0||^3.0.0||^4.0.0
@@ -2498,10 +2468,6 @@ packages:
   astral-regex@2.0.0:
     resolution: {integrity: sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==}
     engines: {node: '>=8'}
-
-  astring@1.9.0:
-    resolution: {integrity: sha512-LElXdjswlqjWrPpJFg1Fx4wpkOCxj1TDHlSV4PlaRxHGWko024xICaa97ZkMfs6DRKlCguiAI+rbXv5GWwXIkg==}
-    hasBin: true
 
   async@2.6.4:
     resolution: {integrity: sha512-mzo5dfJYwAn29PeiJ0zvwTo04zj8HDJj0Mn8TD7sno7q12prdbnasKJHhkm2c1LgrhlJ0teaea8860oxi51mGA==}
@@ -5277,16 +5243,6 @@ packages:
 
   pkg-types@1.2.1:
     resolution: {integrity: sha512-sQoqa8alT3nHjGuTjuKgOnvjo4cljkufdtLMnO2LBP/wRwuDlo1tkaEdMxCRhyGRPacv/ztlZgDPm2b7FAmEvw==}
-
-  pkgroll@2.6.0:
-    resolution: {integrity: sha512-mUvEgILIjoLBNkqkABP5rJnoDde4Ja5CWlUAikjc/gGEwHGX6vikX5pYWxg5zv7JikVJBnC5rapKOnAIaXqm5Q==}
-    engines: {node: '>=18'}
-    hasBin: true
-    peerDependencies:
-      typescript: ^4.1 || ^5.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   pluralize@8.0.0:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
@@ -8294,24 +8250,6 @@ snapshots:
     optionalDependencies:
       rollup: 4.29.1
 
-  '@rollup/plugin-dynamic-import-vars@2.1.5(rollup@4.29.1)':
-    dependencies:
-      '@rollup/pluginutils': 5.1.4(rollup@4.29.1)
-      astring: 1.9.0
-      estree-walker: 2.0.2
-      fast-glob: 3.3.2
-      magic-string: 0.30.17
-    optionalDependencies:
-      rollup: 4.29.1
-
-  '@rollup/plugin-inject@5.0.5(rollup@4.29.1)':
-    dependencies:
-      '@rollup/pluginutils': 5.1.4(rollup@4.29.1)
-      estree-walker: 2.0.2
-      magic-string: 0.30.17
-    optionalDependencies:
-      rollup: 4.29.1
-
   '@rollup/plugin-json@6.1.0(rollup@4.29.1)':
     dependencies:
       '@rollup/pluginutils': 5.1.4(rollup@4.29.1)
@@ -8325,16 +8263,6 @@ snapshots:
       deepmerge: 4.3.1
       is-module: 1.0.0
       resolve: 1.22.8
-    optionalDependencies:
-      rollup: 4.29.1
-
-  '@rollup/plugin-node-resolve@16.0.0(rollup@4.29.1)':
-    dependencies:
-      '@rollup/pluginutils': 5.1.4(rollup@4.29.1)
-      '@types/resolve': 1.20.2
-      deepmerge: 4.3.1
-      is-module: 1.0.0
-      resolve: 1.22.10
     optionalDependencies:
       rollup: 4.29.1
 
@@ -9470,8 +9398,6 @@ snapshots:
       tslib: 2.8.1
 
   astral-regex@2.0.0: {}
-
-  astring@1.9.0: {}
 
   async@2.6.4:
     dependencies:
@@ -12736,22 +12662,6 @@ snapshots:
       confbox: 0.1.8
       mlly: 1.7.3
       pathe: 1.1.2
-
-  pkgroll@2.6.0(typescript@5.7.2):
-    dependencies:
-      '@rollup/plugin-alias': 5.1.1(rollup@4.29.1)
-      '@rollup/plugin-commonjs': 28.0.2(rollup@4.29.1)
-      '@rollup/plugin-dynamic-import-vars': 2.1.5(rollup@4.29.1)
-      '@rollup/plugin-inject': 5.0.5(rollup@4.29.1)
-      '@rollup/plugin-json': 6.1.0(rollup@4.29.1)
-      '@rollup/plugin-node-resolve': 16.0.0(rollup@4.29.1)
-      '@rollup/plugin-replace': 6.0.2(rollup@4.29.1)
-      '@rollup/pluginutils': 5.1.4(rollup@4.29.1)
-      esbuild: 0.24.2
-      magic-string: 0.30.17
-      rollup: 4.29.1
-    optionalDependencies:
-      typescript: 5.7.2
 
   pluralize@8.0.0: {}
 

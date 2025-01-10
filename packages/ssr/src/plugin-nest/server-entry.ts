@@ -108,7 +108,6 @@ const serverRender = async (
 							asyncData,
 							fetchData: combineAysncData,
 							reactiveFetchData: { value: combineAysncData },
-							ssrApp: app,
 						});
 				const customeHeadScriptArr: VNode[] = getVNode(
 					getUserScriptVue({

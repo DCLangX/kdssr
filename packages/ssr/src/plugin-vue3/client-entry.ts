@@ -67,7 +67,6 @@ const clientRender = () => {
 					asyncData,
 					fetchData,
 					reactiveFetchData,
-					ssrApp: app,
 				}),
 			]);
 		},

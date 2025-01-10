@@ -6,11 +6,16 @@
 // Register global plugins/components here
 // Read document get more details http://doc.ssr-fc.com/docs/features$communication#props%20%E7%9B%B4%E5%87%BA%E6%95%B0%E6%8D%AE
 import { useRouter } from "vue-router";
-import { App } from "vue";
+import type { ISSRContext } from "kdssr";
+import { setCtx } from "@/client-store";
 const props = defineProps<{
-	ssrApp: App;
+	ctx?: ISSRContext;
 	asyncData: { value: any };
 }>();
+
+if (!__isBrowser__) {
+	setCtx(props.ctx!);
+}
 const router = useRouter();
 
 router.options.scrollBehavior = (to, from, savedPosition) => {
