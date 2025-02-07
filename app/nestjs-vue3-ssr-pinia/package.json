@@ -46,12 +46,11 @@
   },
   "scripts": {
     "prod": "ssr build && pm2 start pm2.config.cjs",
-    "prod:vite": "ssr build --vite && pm2 start pm2.config.cjs",
     "stop": "pm2 stop pm2.config.js",
     "start": "ssr start",
-    "start:vite": "ssr start --vite",
+    "start:test": "ssr start --viteMode test",
     "build": "ssr build",
-    "build:vite": "ssr build --vite",
+    "build:test": "ssr build --viteMode test",
     "lint": "eslint . --ext .js,.tsx,.ts,.vue --cache",
     "lint:fix": "eslint . --ext .js,.tsx,.ts,.vue --cache --fix",
     "debug": "tsx ../../packages/ssr/src/cli/index.ts build --viteMode test"

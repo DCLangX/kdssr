@@ -9,8 +9,6 @@
 			/>
 			<meta name="theme-color" content="#000000" />
 			<title>Serverless Side Render for Vue3</title>
-			<!-- 初始化移动端 rem 设置，如不需要可自行删除 -->
-			<!-- <slot name="remInitial" /> -->
 			<slot name="injectHeader" />
 		</head>
 		<body>

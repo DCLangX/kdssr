@@ -1,11 +1,8 @@
 import type { ISSRNestContext } from "../plugin-nest/types";
 export type Script = {
 	tagName?: string;
-	describe?:
-		| object
-		| {
-				attrs: object;
-		  };
+	inline?: boolean;
+	describe?: Record<string, string>;
 	content?: string;
 }[];
 
@@ -100,29 +97,6 @@ export interface IConfig {
 	optimize: boolean;
 	onError?: (e: any) => null | string;
 	onReady?: () => any;
-	viteConfig?: () => {
-		common?: {
-			// 双端通用配置
-			extraPlugin?: PluginOption | PluginOption[];
-			server?: ServerOptions;
-		};
-		client?: {
-			/**
-			 * 默认装载的插件定义 options, vue3 场景是 @vitejs/plugin-vue, react 场景是 @vitejs/plugin-react
-			 */
-			defaultPluginOptions?: any;
-			extraPlugin?: PluginOption | PluginOption[];
-			otherConfig?: ViteConfig;
-			processPlugin?: (plugins: PluginOption[]) => PluginOption[];
-		};
-		server?: {
-			externals?: string[];
-			defaultPluginOptions?: any;
-			extraPlugin?: PluginOption | PluginOption[];
-			otherConfig?: ViteConfig;
-			processPlugin?: (plugins: PluginOption[]) => PluginOption[];
-		};
-	};
 	hmr?: {
 		host?: string;
 		port?: number;

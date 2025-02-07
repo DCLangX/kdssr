@@ -1,25 +1,17 @@
 import type { UserConfig } from "kdssr";
 
 const userConfig: UserConfig = {
-	isVite: true,
-	viteConfig() {
-		return {
-			server: {
-				otherConfig: {
-					build: {
-						sourcemap: true,
-					},
-				},
+	customeHeadScript: (ctx) => [
+		{
+			tagName: "script",
+			inline: true,
+			describe: {
+				type: "text/javascript",
+				src: "/web/utils/rem.ts",
 			},
-			client: {
-				otherConfig: {
-					build: {
-						sourcemap: true,
-					},
-				},
-			},
-		};
-	},
+			content: "",
+		},
+	],
 };
 
 export { userConfig };
