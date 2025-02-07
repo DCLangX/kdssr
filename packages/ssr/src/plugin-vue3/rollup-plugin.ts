@@ -22,6 +22,11 @@ interface CustomOutputChunk extends OutputChunk {
 	isDynamicEntry: boolean;
 	modules: Record<string, any>;
 }
+/**
+ * @description: 这是一个rollup插件，用于收集每条路由在首屏加载时所需的静态资源，供服务端首屏渲染时，提早插入到生成的html中，以提高首屏渲染速度
+ * @param {*} options
+ * @return {*}
+ */
 function routeAssetsPlugin(options = {}) {
 	const {
 		routeFile = "ssr-declare-routes.js",
@@ -209,15 +214,16 @@ function routeAssetsPlugin(options = {}) {
 				sourceType: "module",
 				plugins: ["dynamicImport"],
 			});
+			// 使用babel将路由文件内容解析成ast
 
 			const routes = [];
-
 			traverse(ast, {
 				ExportNamedDeclaration(path) {
 					if (
 						path.node.declaration?.declarations?.[0]?.id?.name ===
 						"FeRoutes"
 					) {
+						// 处理路由文件里的FeRoutes数组
 						const routesArray =
 							path.node.declaration.declarations[0].init;
 						if (routesArray.type === "ArrayExpression") {

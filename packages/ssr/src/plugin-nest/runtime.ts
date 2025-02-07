@@ -176,9 +176,20 @@ export const getUserScriptVue = (options: {
 	ctx: ISSRContext;
 	position: "header" | "footer";
 	staticConfig: UserConfig;
+	prefixPath: string;
 }) => {
-	const { script, ctx, position, staticConfig } = options;
-	const defaultScriptArr = getScriptArr(script, ctx);
+	const { script, ctx, position, staticConfig, prefixPath = "/" } = options;
+	const defaultScriptArr = getScriptArr(script, ctx).map((item) => {
+		if (
+			item.tagName === "script" &&
+			item.describe.src &&
+			/^(?!(?:https?:)?\/\/).+/.test(item.describe.src)
+		) {
+			// 针对不为空也不是http和https的路径，加上部署前缀url
+			item.describe.src = prefixPath + item.describe.src;
+		}
+		return item;
+	});
 	const staticScript =
 		position === "header"
 			? staticConfig.customeHeadScript

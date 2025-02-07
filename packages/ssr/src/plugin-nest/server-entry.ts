@@ -42,6 +42,7 @@ const serverRender = async (
 	config: IConfig,
 ) => {
 	const {
+		publicPath,
 		mode,
 		customeHeadScript,
 		customeFooterScript,
@@ -115,6 +116,7 @@ const serverRender = async (
 						ctx,
 						position: "header",
 						staticConfig,
+						prefixPath: publicPath,
 					}),
 				).concat(getInlineCssVNode(inlineCssOrder));
 				const customeFooterScriptArr: VNode[] = getVNode(
@@ -123,6 +125,7 @@ const serverRender = async (
 						ctx,
 						position: "footer",
 						staticConfig,
+						prefixPath: publicPath,
 					}),
 				);
 				return h(

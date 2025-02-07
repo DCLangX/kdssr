@@ -1,0 +1,1 @@
+(function(o,e){const t=e.documentElement;function d(){e.body?e.body.style.fontSize="12px":e.addEventListener("DOMContentLoaded",d)}d();function n(){const i=(t.clientWidth>=750?750:t.clientWidth)/5;t.style.fontSize=i+"px"}n(),o.addEventListener("resize",n),o.addEventListener("pageshow",function(i){i.persisted&&n()})})(window,document);
