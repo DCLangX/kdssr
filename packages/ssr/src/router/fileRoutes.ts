@@ -46,8 +46,8 @@ const parseFeRoutes = async () => {
 		}
 	}
 	// 以上文件路由处理完毕，接下来转成字符串，并替换成异步加载组件的写法，然后写入文件
-	const layoutPath = "@/components/layout/index";
-	const AppPath = "@/components/layout/App";
+	const layoutPath = "@/components/layout/index.vue";
+	const AppPath = "@/components/layout/App.vue";
 	const layoutFetch = await accessFile(
 		join(getFeDir(), "./components/layout/fetch.ts"),
 	);
