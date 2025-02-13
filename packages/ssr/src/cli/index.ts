@@ -103,10 +103,6 @@ yargs(hideBin(process.argv))
 					type: "string",
 					desc: "Setting application server port, default is 3000",
 				},
-				nominify: {
-					type: "boolean",
-					desc: "Disable minify output file content for debug",
-				},
 				...cliDesc,
 			}),
 		async (argv: Argv) => {
@@ -154,9 +150,6 @@ yargs(hideBin(process.argv))
 				},
 				sourcemap: {
 					desc: "Set type of generate sourcemap by build --sourcemap xxx",
-				},
-				nominify: {
-					desc: "Disable minify output file content for debug",
 				},
 				...cliDesc,
 			}),
