@@ -4,8 +4,6 @@ export interface SpinnerMessage {
 	message: "start" | "stop";
 }
 export type Argv = Arguments<{
-	tencent?: boolean;
-	vite?: boolean;
 	test?: boolean;
 	noclean?: boolean;
 	showArgs?: boolean;

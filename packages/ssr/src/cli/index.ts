@@ -63,13 +63,13 @@ const startOrBuild = async (argv: Argv, type: "start" | "build") => {
 	if (!argv.api) {
 		const client = clientPlugin();
 		await client?.[type]?.().catch((err) => {
-			console.error("客户端渲染错误", err);
+			console.error("客户端构建错误", err);
 		});
 	}
 	if (!argv.web) {
 		const server = serverPlugin();
 		await server?.[type]?.(argv).catch((err) => {
-			console.error("服务端渲染错误", err);
+			console.error("服务端错误", err);
 		});
 	}
 	if (type === "build") {

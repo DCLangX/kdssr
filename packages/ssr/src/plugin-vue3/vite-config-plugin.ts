@@ -10,7 +10,7 @@ import type {
 	PluginContext,
 	GetModuleInfo,
 } from "rollup";
-import shell from "shelljs";
+// import shell from "shelljs";
 
 import {
 	loadConfig,
@@ -24,7 +24,7 @@ import {
 } from "../utils";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
-const { mkdir } = shell;
+// const { mkdir } = shell;
 
 // 获取当前模块的绝对路径
 const __filename = fileURLToPath(import.meta.url);
@@ -447,7 +447,10 @@ const manifestPlugin = (): Plugin => {
 				manifest[arr.join(".")] = `${getOutputPublicPath()}${val}`;
 			}
 			if (!(await accessFile(resolve(clientOutPut)))) {
-				mkdir("-p", resolve(clientOutPut));
+				// mkdir("-p", resolve(clientOutPut));
+				await promises.mkdir(resolve(clientOutPut), {
+					recursive: true,
+				});
 			}
 			manifest["vite"] = "1";
 			await promises.writeFile(

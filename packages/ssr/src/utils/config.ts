@@ -1,4 +1,3 @@
-import shell from "shelljs";
 import { transform } from "esbuild";
 import { accessFile, accessFileSync, getCwd, getFeDir } from "./file";
 import { resolve, join } from "node:path";
@@ -12,7 +11,6 @@ import { createHash } from "crypto";
 const require = createRequire(getCwd());
 const traverse = traverseDefault.default;
 
-const { mkdir, cp } = shell;
 export const getStaticConfig = () => {
 	const staticConfigPath = resolve(getCwd(), "./build/staticConfig.cjs");
 	const staticConfig = accessFileSync(staticConfigPath)
@@ -193,7 +191,7 @@ export const transformConfig = async () => {
 	// 转换用户配置
 	const cwd = getCwd();
 	if (!(await accessFile(resolve(cwd, "./build")))) {
-		mkdir(resolve(cwd, "./build"));
+		await promises.mkdir(resolve(cwd, "./build"));
 	}
 	// if (await accessFile(resolve(cwd, "./config.js"))) {
 	// 	cp(
