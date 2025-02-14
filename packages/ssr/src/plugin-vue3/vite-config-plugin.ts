@@ -3,7 +3,7 @@ import { EventEmitter } from "node:events";
 import { resolve, isAbsolute, dirname } from "node:path";
 import type { UserConfig, Plugin } from "vite";
 import { parse as parseImports } from "es-module-lexer";
-import MagicString from "magic-string";
+// import MagicString from "magic-string";
 import type {
 	OutputOptions,
 	PreRenderedChunk,
@@ -190,71 +190,71 @@ export const getBuildConfig = () => {
 	};
 };
 
-const chunkNamePlugin = function (): Plugin {
-	return {
-		name: "chunkNamePlugin",
-		transform(source, id) {
-			if (
-				id.includes("ssr-declare-routes") ||
-				id.includes("ssr-manual-routes")
-			) {
-				console.log(
-					"%c Line:225 🌭 source",
-					"color:#fff;background:#3f7cff",
-					source,
-				);
-				let str = new MagicString(source);
-				const imports = parseImports(source)[0];
-				// 获得import语句的解析
-				for (let index = 0; index < imports.length; index++) {
-					const {
-						s: start, //import内容的开始位置
-						e: end, //import内容的结束位置
-						ss: statementStart, //完整一条import语句的开始位置
-						se: statementEnd, //完整一条import语句的结束位置
-					} = imports[index];
-					// const rawUrl = source.slice(start, end);
-					const rawUrl = source.slice(statementStart, statementEnd);
-					// 这条import语句的内容
-					const chunkTypeName = viteCommentRegExp.exec(rawUrl)?.[1];
-					// 匹配导入语句中包含的 chunkTypeName 注释，并从注释中提取 chunkTypeName 的值，如import(/* chunkTypeName: "index" */ '@/pages/index/render.vue')
-					if (!rawUrl.includes("render")) {
-						if (
-							rawUrl.includes("layout") ||
-							rawUrl.includes("App") ||
-							rawUrl.includes("store")
-						) {
-							str = str.appendRight(
-								statementEnd - 1,
-								"?chunkName=Page",
-							);
-						} else if (chunkTypeName) {
-							str = str.appendRight(
-								statementEnd - 2,
-								`?chunkName=${chunkTypeName}`,
-							);
-							// 类型收窄到这里，基本是动态路由，普通import结尾是',动态路由结尾是')，故需要往前推两位字符插入
-						} else {
-							str = str.appendRight(
-								statementEnd - 1,
-								"?chunkName=Page",
-							);
-						}
-						continue;
-					}
-					str = str.appendRight(
-						statementEnd - 2,
-						`?chunkName=${chunkTypeName}`,
-					);
-					// 类型收窄到这里，基本是动态路由，普通import结尾是',动态路由结尾是')，故需要往前推两位字符插入
-				}
-				return {
-					code: str.toString(),
-				};
-			}
-		},
-	};
-};
+// const chunkNamePlugin = function (): Plugin {
+// 	return {
+// 		name: "chunkNamePlugin",
+// 		transform(source, id) {
+// 			if (
+// 				id.includes("ssr-declare-routes") ||
+// 				id.includes("ssr-manual-routes")
+// 			) {
+// 				console.log(
+// 					"%c Line:225 🌭 source",
+// 					"color:#fff;background:#3f7cff",
+// 					source,
+// 				);
+// 				let str = new MagicString(source);
+// 				const imports = parseImports(source)[0];
+// 				// 获得import语句的解析
+// 				for (let index = 0; index < imports.length; index++) {
+// 					const {
+// 						s: start, //import内容的开始位置
+// 						e: end, //import内容的结束位置
+// 						ss: statementStart, //完整一条import语句的开始位置
+// 						se: statementEnd, //完整一条import语句的结束位置
+// 					} = imports[index];
+// 					// const rawUrl = source.slice(start, end);
+// 					const rawUrl = source.slice(statementStart, statementEnd);
+// 					// 这条import语句的内容
+// 					const chunkTypeName = viteCommentRegExp.exec(rawUrl)?.[1];
+// 					// 匹配导入语句中包含的 chunkTypeName 注释，并从注释中提取 chunkTypeName 的值，如import(/* chunkTypeName: "index" */ '@/pages/index/render.vue')
+// 					if (!rawUrl.includes("render")) {
+// 						if (
+// 							rawUrl.includes("layout") ||
+// 							rawUrl.includes("App") ||
+// 							rawUrl.includes("store")
+// 						) {
+// 							str = str.appendRight(
+// 								statementEnd - 1,
+// 								"?chunkName=Page",
+// 							);
+// 						} else if (chunkTypeName) {
+// 							str = str.appendRight(
+// 								statementEnd - 2,
+// 								`?chunkName=${chunkTypeName}`,
+// 							);
+// 							// 类型收窄到这里，基本是动态路由，普通import结尾是',动态路由结尾是')，故需要往前推两位字符插入
+// 						} else {
+// 							str = str.appendRight(
+// 								statementEnd - 1,
+// 								"?chunkName=Page",
+// 							);
+// 						}
+// 						continue;
+// 					}
+// 					str = str.appendRight(
+// 						statementEnd - 2,
+// 						`?chunkName=${chunkTypeName}`,
+// 					);
+// 					// 类型收窄到这里，基本是动态路由，普通import结尾是',动态路由结尾是')，故需要往前推两位字符插入
+// 				}
+// 				return {
+// 					code: str.toString(),
+// 				};
+// 			}
+// 		},
+// 	};
+// };
 
 const filePathMap: Record<string, string> = {};
 
@@ -575,7 +575,7 @@ const commonConfig = (): UserConfig => {
 	};
 };
 export {
-	chunkNamePlugin,
+	// chunkNamePlugin,
 	manifestPlugin,
 	rollupOutputOptions,
 	commonConfig,
