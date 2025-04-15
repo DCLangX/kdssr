@@ -99,11 +99,13 @@ async function viteRender(ctx: ISSRContext, config: IConfig) {
 	const { isDev, dynamicFile } = config;
 	let serverRes;
 	if (isDev) {
-		// 开发模式使用vite实时渲染
+		// 开发模式使用vite实时渲染，这里的vite服务器仅用作服务端首屏渲染功能，静态文件实际是由中间件那里的viteServer提供的
 		const __dirname = getDirname(import.meta.url);
 		const { createServer } = await import("vite");
 		viteServer = !viteServer
 			? await createServer({
+					server: { middlewareMode: true },
+					appType: "custom",
 					define: {
 						__isBrowser__: false,
 					},

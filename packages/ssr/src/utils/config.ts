@@ -211,6 +211,7 @@ export const transformConfig = async () => {
 			format: "cjs",
 			keepNames: true,
 		});
+		// 转换成cjs是为了能够在其他地方以同步的方式导入配置
 		await promises.writeFile(resolve(cwd, "./build/config.cjs"), code);
 	}
 };
@@ -245,18 +246,18 @@ export const loadConfig = (): IConfig => {
 	const isVite = true;
 	const optimize = process.env.OPTIMIZE === "1";
 	const isCI = !!process.env.CI_TEST;
-	const vue3ServerEntry = join(
-		cwd,
-		"./node_modules/kdssr/dist/esm/plugin-nest/server-entry.js",
-	);
-	const vue3ClientEntry = join(
-		cwd,
-		"./node_modules/ssr-plugin-vue3/esm/entry/client-entry.js",
-	);
+	// const vue3ServerEntry = join(
+	// 	cwd,
+	// 	"./node_modules/kdssr/dist/esm/plugin-nest/server-entry.js",
+	// );
+	// const vue3ClientEntry = join(
+	// 	cwd,
+	// 	"./node_modules/ssr-plugin-vue3/esm/entry/client-entry.js",
+	// );
 	// const supportOptinalChaining = coerce(process.version)!.major >= 14;
 	const define = userConfig.define ?? {};
-	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-	userConfig.define && stringifyDefine(define);
+
+	// userConfig.define && stringifyDefine(define);
 
 	const alias = Object.assign(
 		{
@@ -388,8 +389,8 @@ export const loadConfig = (): IConfig => {
 			https,
 			manifestPath,
 			proxyKey,
-			vue3ServerEntry,
-			vue3ClientEntry,
+			// vue3ServerEntry,
+			// vue3ClientEntry,
 			isVite,
 			whiteList,
 			isCI,

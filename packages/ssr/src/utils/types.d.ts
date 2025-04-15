@@ -92,8 +92,8 @@ export interface IConfig {
 	nestStartTips?: string;
 	manifestPath: string;
 	proxyKey: string[];
-	vue3ServerEntry: string;
-	vue3ClientEntry: string;
+	// vue3ServerEntry: string;
+	// vue3ClientEntry: string;
 	optimize: boolean;
 	onError?: (e: any) => null | string;
 	onReady?: () => any;

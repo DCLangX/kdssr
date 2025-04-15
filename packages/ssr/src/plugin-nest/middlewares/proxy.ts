@@ -15,12 +15,14 @@ const getDevProxyMiddlewaresArr = async () => {
 	// proxy && registerProxy(proxy);
 
 	if (isDev) {
-		// 本地开发请求走 vite 接管 前端文件夹请求
 		const { createServer } = await import("vite");
-
+		// 开发模式下这里的vite服务器仅用作静态文件的构建和托管，首屏渲染内容实际是由后续viteRender那里的另一个的vite服务器生成的
 		const viteServer = await createServer({
 			server: { middlewareMode: true },
 			appType: "custom",
+			define: {
+				__isBrowser__: true,
+			},
 		});
 		proxyMiddlewaresArr.push(viteServer.middlewares);
 	}
